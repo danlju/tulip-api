@@ -11,7 +11,7 @@ public class GitHubClient {
 
     private final WebClient webClient;
 
-    public GitHubClient(@Value("${github.token}") String token) {
+    public GitHubClient(@Value("${GITHUB_TOKEN}") String token) {
         this.webClient = WebClient.builder()
                 .baseUrl("https://api.github.com")
                 .defaultHeader("Authorization", "Bearer " + token)
