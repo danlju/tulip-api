@@ -16,7 +16,9 @@ public class InMemoryProjectRepository implements ProjectRepository {
     public InMemoryProjectRepository() {
         projectMap = new HashMap<>();
 
-        Project project = new Project(UUID.randomUUID(), "kaado-srs", "kaado-srs");
+        Project project = new Project(UUID.randomUUID(), "tulip-api", "tulip-api");
+        projectMap.put(project.getId(), project);
+        project = new Project(UUID.randomUUID(), "kaado-srs", "kaado-srs");
         projectMap.put(project.getId(), project);
         project = new Project(UUID.randomUUID(), "kaado", "kaado");
         projectMap.put(project.getId(), project);
