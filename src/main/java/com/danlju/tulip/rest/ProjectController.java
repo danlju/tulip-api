@@ -63,8 +63,16 @@ public class ProjectController {
             @JsonProperty("head_sha") String commitHash,
             @JsonProperty("head_branch") String headBranch,
             @JsonProperty("display_title") String displayTitle,
-            @JsonProperty("run_number") String runNumber
+            @JsonProperty("run_number") String runNumber,
+            Repository repository
     ) {}
+
+    public record Repository(
+       long id,
+       String node_id,
+       String name,
+       String full_name
+    ){}
 }
 
 

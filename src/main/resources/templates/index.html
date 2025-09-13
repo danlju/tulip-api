@@ -23,7 +23,7 @@
 </head>
 <body>
   <div class="container py-5">
-    <h1 class="mb-4 text-center">My Projects</h1>
+    <h2 class="mb-4 font-monospace">TULIP CI/CD <img src="../img/tulip-logo.png"></h2>
     <div class="row g-4" id="projects-container">
       <!-- Projects will be injected here -->
     </div>
@@ -36,7 +36,6 @@
 
   <script>
     $(document).ready(function () {
-      // Example REST API endpoint (replace with your own)
       const apiUrl = "http://localhost:8080/projects";
 
       $.get(apiUrl, function (data) {
