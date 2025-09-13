@@ -35,9 +35,6 @@
             }
         }
         .in-progress-blinking {
-            text-align: center;
-            margin-top: 20%;
-            font-size: 24px;
             color: green;
             animation: blink 2s infinite;
         }
@@ -53,7 +50,8 @@
 </head>
 <body>
 <div class="container py-5">
-    <h1 th:text="${projectId}" class="mb-4 text-center">error</h1>
+    <h2 class="mb-4 font-monospace"><a style="color: #000; text-decoration: none" href="/">TULIP CI/CD </a><img src="../img/tulip-logo.png"></h2>
+    <h5 th:text="${projectId}" class="mb-4">error</h5>
     <div class="grid" id="projects-container">
     </div>
 </div>

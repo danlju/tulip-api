@@ -15,9 +15,7 @@ public class ProjectWebController {
 
     @GetMapping("/project/{id}")
     public String project(@PathVariable String id, Model model) {
-
         model.addAttribute("projectId", id);
-
         return "project";
     }
 

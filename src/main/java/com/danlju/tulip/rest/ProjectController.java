@@ -74,5 +74,3 @@ public class ProjectController {
        String full_name
     ){}
 }
-
-
