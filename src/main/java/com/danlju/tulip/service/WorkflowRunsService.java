@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowRunsService {
 
     @Autowired
-    GitHubClient gitHubClient;
+    private GitHubClient gitHubClient;
 
     @Cacheable(value = "workflowRuns", key = "#repo")
     public ProjectController.WorkflowRunsResponse getWorkflowRuns(String owner, String repo) {

@@ -28,4 +28,10 @@ public class GitHubClient {
         ResponseEntity<ProjectController.WorkflowRunsResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, ProjectController.WorkflowRunsResponse.class);
         return response.getBody();
     }
+
+    // TODO: create webhook for workflow status changes
+    public String createWorkflowWebhook(String owner, String repo) {
+        return "";
+    }
+
 }

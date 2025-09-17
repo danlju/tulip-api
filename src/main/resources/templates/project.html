@@ -45,6 +45,9 @@
             text-overflow: "";
             max-width: 8ch;
         }
+        .status-circle {
+            font-size: 2.1rem;
+        }
     </style>
 </head>
 <body>
@@ -97,8 +100,10 @@
                 <h3 class="fw-bold">${workflow_run.run_number}</h3>
                 <p><span class="fw-bold">Branch:</span> ${workflow_run.head_branch}</p>
                 <p><span class="fw-bold">Commit: </span>${workflow_run.display_title}  <a target="_blank" href="https://github.com/${workflow_run.repository.full_name}/commit/${workflow_run.head_sha}"><span class="sha-text">${workflow_run.head_sha}</span></a></p>
-                <p><span class="fw-bold">Status:</span> <span class="${statusClass}">${status}</span></p>
-                <i class="bi bi-circle-fill ${statusClass}"></i>
+                <p><span class="fw-bold">Status:</span>
+
+                <i class="status-circle bi bi-circle-fill ${statusClass}"></i>
+                </p>
               </div>
             </div>
           `;
