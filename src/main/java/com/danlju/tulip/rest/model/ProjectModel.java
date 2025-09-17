@@ -11,5 +11,4 @@ public class ProjectModel {
         this.name = name;
         this.githubName = githubName;
     }
-
 }

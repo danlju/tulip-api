@@ -1,9 +1,9 @@
 package com.danlju.tulip.rest;
 
 import com.danlju.tulip.domain.Project;
-import com.danlju.tulip.github.GitHubClient;
 import com.danlju.tulip.repo.ProjectRepository;
 import com.danlju.tulip.rest.model.ProjectModel;
+import com.danlju.tulip.service.WorkflowRunsService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class ProjectController {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private GitHubClient gitHubClient;
+    private WorkflowRunsService workflowRunsService;
 
     @GetMapping("/projects")
     public ResponseEntity<List<ProjectModel>> list() {
@@ -31,8 +30,8 @@ public class ProjectController {
     }
 
     @GetMapping("/projects/{repo}")
-    public Mono<WorkflowRunsResponse> getWorkflowRuns(@PathVariable String repo) {
-        return gitHubClient.getWorkflowRuns("danlju", repo);
+    public WorkflowRunsResponse getWorkflowRuns(@PathVariable String repo) {
+        return workflowRunsService.getWorkflowRuns("danlju", repo); // TODO: owner?
     }
 
     private ProjectModel toModel(Project project) {
@@ -42,7 +41,6 @@ public class ProjectController {
     // createProject
     // deleteProject
     // caching
-
 
     public record WorkflowRunsResponse(
             @JsonProperty("total_count") int totalCount,
@@ -72,5 +70,5 @@ public class ProjectController {
        String node_id,
        String name,
        String full_name
-    ){}
+    ) {}
 }

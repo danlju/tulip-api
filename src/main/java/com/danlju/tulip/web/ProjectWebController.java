@@ -18,5 +18,4 @@ public class ProjectWebController {
         model.addAttribute("projectId", id);
         return "project";
     }
-
 }

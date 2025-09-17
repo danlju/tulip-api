@@ -15,7 +15,7 @@ public class CacheConfig {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager("workflowRuns");
         cacheManager.setCaffeine(
                 Caffeine.newBuilder()
-                        .expireAfterWrite(Duration.ofMinutes(5))
+                        .expireAfterWrite(Duration.ofSeconds(30))
                         .maximumSize(100)
         );
         return cacheManager;
