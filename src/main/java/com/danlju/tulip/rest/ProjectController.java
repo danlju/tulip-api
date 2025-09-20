@@ -8,9 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,7 +29,15 @@ public class ProjectController {
 
     @GetMapping("/projects/{repo}")
     public WorkflowRunsResponse getWorkflowRuns(@PathVariable String repo) {
-        return workflowRunsService.getWorkflowRuns("danlju", repo); // TODO: owner?
+        var result = workflowRunsService.getWorkflowRuns("danlju", repo); // TODO: owner?
+        return result;
+    }
+
+    @PostMapping(value = "/projects/{repo}/run", consumes = "application/json")
+    public String startWorkflowRun(@RequestBody StartWorkflowRequest startWorkflowRequest) {
+        // TODO: use path variable?
+
+        return workflowRunsService.startWorkflowRun(startWorkflowRequest.owner, startWorkflowRequest.projectId, startWorkflowRequest.workflowId, startWorkflowRequest.branch).toString();
     }
 
     private ProjectModel toModel(Project project) {
@@ -41,6 +47,14 @@ public class ProjectController {
     // createProject
     // deleteProject
     // caching
+
+
+    public record StartWorkflowRequest(
+        String owner,
+        String projectId,
+        String workflowId,
+        String branch
+    ) {}
 
     public record WorkflowRunsResponse(
             @JsonProperty("total_count") int totalCount,

@@ -5,6 +5,13 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      test-input:
+        description: 'test'
+        required: false
+        default: 'test default'
+        type: string
 
 env:
   GITHUB_TOKEN: githubToken1
