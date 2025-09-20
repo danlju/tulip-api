@@ -38,17 +38,13 @@ public class GitHubClient {
         String url = "https://api.github.com/repos/" + owner + "/" + repo + "/actions/workflows/" + workflowId + "/dispatches";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
-        headers.set("Accept", "Accept: application/vnd.github+json");
-
-        logger.info("---> HEADERS: {}", headers);
-        logger.info("---> BRANCH: {}", branch);
-
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(Map.of("ref", branch), headers);
         ResponseEntity<HttpStatusCode> response = restTemplate.exchange(url,
                 HttpMethod.POST,
                 entity,
-                HttpStatusCode.class, Map.of("ref", branch));
+                HttpStatusCode.class
+                );
         return response; // TODO: how to handle response?
     }
 
