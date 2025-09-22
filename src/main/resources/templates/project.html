@@ -65,7 +65,7 @@
                     <input type="hidden" name="projectId" th:value="${projectId}"/>
                     <input type="hidden" name="owner" value="danlju" />
                     <input type="hidden" name="workflowId" value="188874644" />
-                    <button type="button" class="btn btn-primary btn-lg">Start build</button>
+                    <button type="button" id="start-build-btn" class="btn btn-primary btn-lg">Start build</button>
                 </div>
             </form>
         </div>
@@ -82,7 +82,7 @@
 
     $(document).ready(function () {
 
-        $("#start-build-form").click(function(e){
+        $("#start-build-btn").click(function(e) {
 
             $.ajax({
 
