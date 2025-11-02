@@ -18,12 +18,16 @@ public class GitHubClient {
     private final RestTemplate restTemplate;
     private final String token;
 
+    // TODO: pass each user's token with the api calls
     public GitHubClient(@Value("${GITHUB_TOKEN:}") String token) {
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("GitHub token not found");
+        }
         this.token = token;
         this.restTemplate = new RestTemplate();
     }
 
-    public ProjectController.WorkflowRunsResponse getWorkflowRuns(String owner, String repo) {
+    public ProjectController.WorkflowRunsResponse getWorkflowRuns(String owner, String repo) { // TODO: add token
         String url = "https://api.github.com/repos/" + owner + "/" + repo + "/actions/runs";
 
         HttpHeaders headers = new HttpHeaders();
@@ -40,12 +44,11 @@ public class GitHubClient {
         headers.set("Authorization", "Bearer " + token);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(Map.of("ref", branch), headers);
-        ResponseEntity<HttpStatusCode> response = restTemplate.exchange(url,
+        return restTemplate.exchange(url,
                 HttpMethod.POST,
                 entity,
                 HttpStatusCode.class
-                );
-        return response; // TODO: how to handle response?
+                ); // TODO: how to handle response?
     }
 
     // TODO: create webhook for workflow status changes

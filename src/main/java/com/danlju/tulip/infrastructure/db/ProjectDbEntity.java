@@ -1,23 +1,32 @@
-package com.danlju.tulip.domain;
+package com.danlju.tulip.infrastructure.db;
+
+import com.danlju.tulip.domain.Project;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
-public class Project {
+@Entity
+@Table(name = "projects")
+public class ProjectDbEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private UUID publicId;
+    @Column(unique = true)
     private String name;
+    @Column(unique = true)
     private String githubName;
-    // TODO: ownership
 
-    public Project(Integer id, UUID publicId, String name, String githubName) {
+    
+    public ProjectDbEntity(Integer id, UUID publicId, String name, String githubName) {
         this.id = id;
         this.publicId = publicId;
         this.name = name;
         this.githubName = githubName;
     }
 
-    public Project(UUID publicId, String name, String githubName) {
+    public ProjectDbEntity(UUID publicId, String name, String githubName) {
         this.publicId = publicId;
         this.name = name;
         this.githubName = githubName;
@@ -53,5 +62,16 @@ public class Project {
 
     public void setGithubName(String githubName) {
         this.githubName = githubName;
+    }
+
+    public static ProjectDbEntity fromProject(Project project) {
+        if (project == null) {
+            return null;
+        }
+        return new ProjectDbEntity(project.getPublicId(), project.getName(), project.getGithubName());
+    }
+
+    public static Project toProject(ProjectDbEntity dbEntity) {
+        return new Project(dbEntity.id, dbEntity.publicId, dbEntity.name, dbEntity.githubName);
     }
 }

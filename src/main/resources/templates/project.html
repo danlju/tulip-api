@@ -79,24 +79,30 @@
 
 <script th:inline="javascript">
 
+    function convertFormToJSON(form) {
+  const array = $(form).serializeArray(); // Encodes the set of form elements as an array of names and values.
+  const json = {};
+  $.each(array, function () {
+    json[this.name] = this.value || "";
+  });
+  return json;
+}
 
     $(document).ready(function () {
 
+      const apiUrl = "http://localhost:8080/projects";
         $("#start-build-btn").click(function(e) {
-
             $.ajax({
-
                 url: "/projects/[(${projectId})]/run", // TODO: hardcoded
                 type: "POST",
                 contentType: "application/json",
                 data: convertFormToJSON("#start-build-form"),
 
                 success: function(data){
-                    alert(data);
+                    setTimeout(function() { refreshWorkflowRuns(); }, 5000);
                 }
 
             });
-
         });
     //});
 
@@ -109,6 +115,17 @@
         return JSON.stringify(json);
       }
 
+      function refreshWorkflowRuns() {
+         $("#projects-container").html("");
+          $.get(apiUrl + "/" + projectId + "/refresh", populateProjects)
+          .fail(function () {
+            $("#projects-container").html(
+              `<div class="col-12 text-center text-danger">⚠️ Failed to load projects.</div>`
+            );
+          });
+
+      }
+
 
           $("#new-build-btn").click(function(){
             $("#new-build-div").toggle();
@@ -117,9 +134,15 @@
       $("#new-build-div").toggle();
       // Example REST API endpoint (replace with your own)
       var projectId =  [[${projectId}]];
-      const apiUrl = "http://localhost:8080/projects/" + projectId;
 
-      $.get(apiUrl, function (data) {
+      $.get(apiUrl + "/" + projectId, populateProjects)
+      .fail(function () {
+        $("#projects-container").html(
+          `<div class="col-12 text-center text-danger">⚠️ Failed to load projects.</div>`
+        );
+      });
+
+      function populateProjects(data) {
         // data is an array of projects
         const container = $("#projects-container");
 
@@ -161,12 +184,8 @@
           `;
           container.append(card);
         });
-      })
-      .fail(function () {
-        $("#projects-container").html(
-          `<div class="col-12 text-center text-danger">⚠️ Failed to load projects.</div>`
-        );
-      });
+      }
+
     });
 </script>
 </body>

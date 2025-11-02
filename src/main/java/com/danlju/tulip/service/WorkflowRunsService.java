@@ -5,7 +5,6 @@ import com.danlju.tulip.rest.ProjectController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +20,7 @@ public class WorkflowRunsService {
         return gitHubClient.getWorkflowRuns(owner, repo);
     }
 
-    @CachePut(value = "workflowRuns", key = "repo")
+    @CachePut(value = "workflowRuns", key = "#repo")
     public ProjectController.WorkflowRunsResponse refreshWorkflowRuns(String owner, String repo) {
         return gitHubClient.getWorkflowRuns(owner, repo);
     }

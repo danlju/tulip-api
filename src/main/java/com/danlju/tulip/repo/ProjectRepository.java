@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProjectRepository {
-    Project getById(UUID id);
+
+    Project getByPublicId(UUID id);
+
     Project save(Project project);
+
     List<Project> findAll();
 }

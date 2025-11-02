@@ -1,0 +1,11 @@
+services:
+  mysql:
+    container_name: 'tulip-dev-db'
+    image: 'mysql:latest'
+    environment:
+      - 'MYSQL_DATABASE=tulipdb'
+      - 'MYSQL_PASSWORD=password'
+      - 'MYSQL_ROOT_PASSWORD=password'
+      - 'MYSQL_USER=tulipdb'
+    ports:
+      - '3306:3306'

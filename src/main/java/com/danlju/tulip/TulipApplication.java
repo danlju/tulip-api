@@ -11,5 +11,4 @@ public class TulipApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TulipApplication.class, args);
 	}
-
 }

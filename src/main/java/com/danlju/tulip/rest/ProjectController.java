@@ -5,15 +5,20 @@ import com.danlju.tulip.repo.ProjectRepository;
 import com.danlju.tulip.rest.model.ProjectModel;
 import com.danlju.tulip.service.WorkflowRunsService;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class ProjectController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -23,37 +28,56 @@ public class ProjectController {
 
     @GetMapping("/projects")
     public ResponseEntity<List<ProjectModel>> list() {
-        List<ProjectModel> models = projectRepository.findAll().stream().map(this::toModel).toList();
-        return new ResponseEntity<>(models, HttpStatus.OK);
+        return new ResponseEntity<>(List.of(), HttpStatus.OK);
     }
 
     @GetMapping("/projects/{repo}")
     public WorkflowRunsResponse getWorkflowRuns(@PathVariable String repo) {
-        var result = workflowRunsService.getWorkflowRuns("danlju", repo); // TODO: owner?
-        return result;
+        // TODO: owner?
+        return workflowRunsService.getWorkflowRuns("danlju", repo);
+    }
+
+    @GetMapping("/projects/{repo}/refresh")
+    public WorkflowRunsResponse refreshWorkflowRuns(@PathVariable String repo) {
+        // TODO: owner?
+        return workflowRunsService.refreshWorkflowRuns("danlju", repo);
     }
 
     @PostMapping(value = "/projects/{repo}/run", consumes = "application/json")
     public String startWorkflowRun(@RequestBody StartWorkflowRequest startWorkflowRequest) {
         // TODO: use path variable?
-
         return workflowRunsService.startWorkflowRun(startWorkflowRequest.owner, startWorkflowRequest.projectId, startWorkflowRequest.workflowId, startWorkflowRequest.branch).toString();
     }
 
     private ProjectModel toModel(Project project) {
         return new ProjectModel(project.getId().toString(), project.getName(), project.getGithubName());
     }
-    // TODO:
-    // createProject
-    // deleteProject
-    // caching
 
+    @PostMapping(value = "/projects", consumes = "application/json")
+    private String createProject(@RequestBody CreateProjectModel model) {
+        logger.info("Request: {}", model);
+        // TODO: validation (including duplicate names/ids)
+
+        projectRepository.save(new Project(UUID.randomUUID(), model.name, model.githubName));
+
+        return "ok";
+    }
+
+    private Project modelToProject(CreateProjectModel model) {
+        return new Project(null, UUID.randomUUID(), model.name, model.githubName);
+    }
 
     public record StartWorkflowRequest(
         String owner,
         String projectId,
         String workflowId,
         String branch
+    ) {}
+
+    public record CreateProjectModel(
+            String owner,
+            String name,
+            String githubName
     ) {}
 
     public record WorkflowRunsResponse(
