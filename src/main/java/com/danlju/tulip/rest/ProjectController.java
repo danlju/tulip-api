@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProjectController {
@@ -28,7 +29,9 @@ public class ProjectController {
 
     @GetMapping("/projects")
     public ResponseEntity<List<ProjectModel>> list() {
-        return new ResponseEntity<>(List.of(), HttpStatus.OK);
+        List<Project> projects = projectRepository.findAll();
+        var models = projects.stream().map(this::toModel).collect(Collectors.toList());
+        return new ResponseEntity<>(models, HttpStatus.OK);
     }
 
     @GetMapping("/projects/{repo}")
@@ -50,7 +53,7 @@ public class ProjectController {
     }
 
     private ProjectModel toModel(Project project) {
-        return new ProjectModel(project.getId().toString(), project.getName(), project.getGithubName());
+        return new ProjectModel(project.getId().toString(), project.getPublicId().toString(),  project.getName(), project.getGithubName());
     }
 
     @PostMapping(value = "/projects", consumes = "application/json")

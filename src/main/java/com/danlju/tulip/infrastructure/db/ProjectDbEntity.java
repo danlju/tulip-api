@@ -18,7 +18,9 @@ public class ProjectDbEntity {
     @Column(unique = true)
     private String githubName;
 
-    
+    public ProjectDbEntity() {
+    }
+
     public ProjectDbEntity(Integer id, UUID publicId, String name, String githubName) {
         this.id = id;
         this.publicId = publicId;

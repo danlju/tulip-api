@@ -4,6 +4,7 @@ import com.danlju.tulip.domain.Project;
 import com.danlju.tulip.repo.ProjectRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,6 +41,8 @@ public class ProjectMySqlRepository implements ProjectRepository {
 
     @Override
     public List<Project> findAll() {
-        return List.of();
+        var projects = new ArrayList<ProjectDbEntity>();
+        projectCrudRepository.findAll().iterator().forEachRemaining(projects::add);
+        return projects.stream().map(ProjectDbEntity::toProject).toList();
     }
 }
