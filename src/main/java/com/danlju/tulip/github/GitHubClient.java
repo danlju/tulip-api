@@ -1,6 +1,7 @@
 package com.danlju.tulip.github;
 
 import com.danlju.tulip.rest.ProjectController;
+import com.danlju.tulip.service.WorkflowRunsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,14 +28,13 @@ public class GitHubClient {
         this.restTemplate = new RestTemplate();
     }
 
-    public ProjectController.WorkflowRunsResponse getWorkflowRuns(String owner, String repo) { // TODO: add token
+    public WorkflowRunsService.WorkflowRunsResponse getWorkflowRuns(String owner, String repo) { // TODO: add token
         String url = "https://api.github.com/repos/" + owner + "/" + repo + "/actions/runs";
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<ProjectController.WorkflowRunsResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, ProjectController.WorkflowRunsResponse.class);
+        ResponseEntity<WorkflowRunsService.WorkflowRunsResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, WorkflowRunsService.WorkflowRunsResponse.class);
         return response.getBody();
     }
 
