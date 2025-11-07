@@ -1,5 +1,6 @@
 package com.danlju.tulip.service;
 
+import com.danlju.tulip.Utils;
 import com.danlju.tulip.domain.Build;
 import com.danlju.tulip.github.GitHubClient;
 import com.danlju.tulip.repo.BuildRepository;
@@ -46,9 +47,10 @@ public class BuildService {
 
         for (var run : runs.workflowRuns()) {
             var build = buildRepository.findByExternalId(String.valueOf(run.id()));
+
             if (build == null) {
                 logger.info("No Build found with external ID: {}", run.workflowId());
-                buildRepository.save(
+                var savedBuild = buildRepository.save(
                         new Build(
                                 UUID.randomUUID(),
                                 String.valueOf(run.id()),
@@ -57,8 +59,8 @@ public class BuildService {
                                 run.commitHash(),
                                 run.headBranch(),
                                 run.status(),
-                                Instant.now(),
-                                Instant.now()
+                                Instant.parse(run.createdAt()),
+                                Instant.parse(run.updatedAt())
                         ));
             } else if (build.getUpdatedAt().isAfter(project.getLastSyncedAt())) {
                 logger.info("Syncing build in database for external ID: {}", build.getExternalId());
@@ -68,9 +70,14 @@ public class BuildService {
                 build.setUpdatedAt(newUpdatedTime);
                 buildRepository.save(build);
 
-                project.setLastSyncedAt(newUpdatedTime);
-                projectRepository.save(project);
+            }
+            if (Instant.parse(run.updatedAt()).isAfter(project.getMostRecentBuild())) {
+                logger.info("Updating project most recent build");
+                project.setMostRecentBuild(Instant.parse(run.updatedAt()));
+                project.setMostRecentBuildStatus(Utils.mapGithubStatus(run.conclusion(), run.status()));
             }
         }
+        project.setLastSyncedAt(Instant.now());
+        projectRepository.save(project);
     }
 }

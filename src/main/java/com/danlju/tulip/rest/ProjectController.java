@@ -1,5 +1,6 @@
 package com.danlju.tulip.rest;
 
+import com.danlju.tulip.Utils;
 import com.danlju.tulip.domain.Project;
 import com.danlju.tulip.repo.ProjectRepository;
 import com.danlju.tulip.rest.model.ProjectModel;
@@ -92,7 +93,7 @@ public class ProjectController {
         List<BuildsResponseModelBuild> builds = new ArrayList<>();
         for (WorkflowRunsService.WorkflowRun run : workflowRuns) {
             builds.add(
-                    new BuildsResponseModelBuild(run.id(), run.name(), mapStatus(run.conclusion(), run.status()), run.commitHash(), run.headBranch(), run.runNumber(), run.displayTitle())
+                    new BuildsResponseModelBuild(run.id(), run.name(), Utils.mapGithubStatus(run.conclusion(), run.status()), run.commitHash(), run.headBranch(), run.runNumber(), run.displayTitle())
             );
         }
 
