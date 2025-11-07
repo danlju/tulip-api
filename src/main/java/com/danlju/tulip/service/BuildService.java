@@ -46,6 +46,7 @@ public class BuildService {
 
         logger.info("Found {} builds", runs.workflowRuns().size());
 
+        Instant lastSynced = Instant.now();
         for (var run : runs.workflowRuns()) {
 
             var build = buildRepository.findByExternalId(String.valueOf(run.id()));
@@ -63,7 +64,7 @@ public class BuildService {
                 project.setMostRecentBuildStatus(Utils.mapGithubStatus(run.conclusion(), run.status()));
             }
         }
-        project.setLastSyncedAt(Instant.now());
+        project.setLastSyncedAt(lastSynced);
         projectRepository.save(project);
     }
 
