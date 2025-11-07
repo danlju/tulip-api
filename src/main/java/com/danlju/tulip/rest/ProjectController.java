@@ -3,6 +3,7 @@ package com.danlju.tulip.rest;
 import com.danlju.tulip.domain.Project;
 import com.danlju.tulip.repo.ProjectRepository;
 import com.danlju.tulip.rest.model.ProjectModel;
+import com.danlju.tulip.service.BuildService;
 import com.danlju.tulip.service.WorkflowRunsService;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +31,9 @@ public class ProjectController {
     @Autowired
     private WorkflowRunsService workflowRunsService;
 
+    @Autowired
+    private BuildService buildService;
+
     @GetMapping("/projects")
     public ResponseEntity<List<ProjectModel>> list() {
         List<Project> projects = projectRepository.findAll();
@@ -38,15 +43,25 @@ public class ProjectController {
 
     @GetMapping("/projects/{repo}")
     public BuildsResponseModel getWorkflowRuns(@PathVariable String repo) {
-        // TODO: owner?
-        return toBuildsResponseModel(
-                workflowRunsService.getWorkflowRuns("danlju", repo)
-        );
+        var builds = workflowRunsService.getWorkflowRuns("danlju", repo);
+//
+//        if (!builds.workflowRuns().isEmpty()) {
+//            var run = builds.workflowRuns().get(0);
+//            run.
+//        }
+//        projectService.updateProjectInfo();
+        return toBuildsResponseModel(builds);
+    }
+
+    @GetMapping("/projects/sync")
+    public String sync() {
+        buildService.syncBuilds("danlju", "tulip-api");
+
+        return "ok";
     }
 
     @GetMapping("/projects/{repo}/refresh")
     public BuildsResponseModel refreshWorkflowRuns(@PathVariable String repo) {
-        // TODO: owner?
         return toBuildsResponseModel(
                 workflowRunsService.refreshWorkflowRuns("danlju", repo)
         );
@@ -54,22 +69,19 @@ public class ProjectController {
 
     @PostMapping(value = "/projects/{repo}/run", consumes = "application/json")
     public String startWorkflowRun(@RequestBody StartWorkflowRequest startWorkflowRequest) {
-        // TODO: use path variable?
         return workflowRunsService.startWorkflowRun(startWorkflowRequest.owner, startWorkflowRequest.projectId, startWorkflowRequest.workflowId, startWorkflowRequest.branch).toString();
     }
 
     @PostMapping(value = "/projects", consumes = "application/json")
     private String createProject(@RequestBody CreateProjectModel model) {
-        logger.info("Request: {}", model);
-        // TODO: validation (including duplicate names/ids)
 
-        projectRepository.save(new Project(UUID.randomUUID(), model.name, model.githubName));
+        projectRepository.save(new Project(UUID.randomUUID(), model.name, model.githubName, 10, Instant.ofEpochMilli(0), "unknown", Instant.ofEpochMilli(0)));
 
         return "ok";
     }
 
     private ProjectModel toModel(Project project) {
-        return new ProjectModel(project.getId().toString(), project.getPublicId().toString(),  project.getName(), project.getGithubName());
+        return new ProjectModel(project.getId().toString(), project.getPublicId().toString(), project.getName(), project.getGithubName());
     }
 
     private BuildsResponseModel toBuildsResponseModel(WorkflowRunsService.WorkflowRunsResponse response) {
@@ -83,54 +95,52 @@ public class ProjectController {
                     new BuildsResponseModelBuild(run.id(), run.name(), mapStatus(run.conclusion(), run.status()), run.commitHash(), run.headBranch(), run.runNumber(), run.displayTitle())
             );
         }
+
         return builds;
     }
 
     private String mapStatus(String conclusion, String status) {
-            if (conclusion.isBlank()) {
-                if (Objects.equals(status, "failed")) {
-                    return "failure";
-                } else if (Objects.equals(status, "in_progress")) {
-                    return "running";
-                } else if (
-                        Objects.equals(status, "waiting")
-                                || Objects.equals(status, "queued")
-                                || Objects.equals(status, "requested")) {
-                    return "pending";
-                }
-            } else if (conclusion.equals("failure")) {
+        if (conclusion == null || conclusion.isBlank()) {
+            if (Objects.equals(status, "failed")) {
                 return "failure";
-            } else if (conclusion.equals("success")) {
-                return "success";
+            } else if (Objects.equals(status, "in_progress")) {
+                return "running";
+            } else if (
+                    Objects.equals(status, "waiting")
+                            || Objects.equals(status, "queued")
+                            || Objects.equals(status, "requested")) {
+                return "pending";
             }
+        } else if (conclusion.equals("failure")) {
+            return "failure";
+        } else if (conclusion.equals("success")) {
+            return "success";
+        }
+
         return "unknown";
     }
 
     public record StartWorkflowRequest(
-        String owner,
-        String projectId,
-        String workflowId,
-        String branch
-    ) {}
+            String owner,
+            String projectId,
+            String workflowId,
+            String branch
+    ) {
+    }
 
     public record CreateProjectModel(
             String owner,
             String name,
             String githubName
-    ) {}
+    ) {
+    }
 
-
-    public record Repository(
-       long id,
-       String node_id,
-       String name,
-       String full_name
-    ) {}
 
     public record BuildsResponseModel(
             @JsonProperty("total_count") int totalCount,
             @JsonProperty("builds") List<BuildsResponseModelBuild> builds
-    ) {}
+    ) {
+    }
 
     public static class BuildsResponseModelBuild {
         public long id;

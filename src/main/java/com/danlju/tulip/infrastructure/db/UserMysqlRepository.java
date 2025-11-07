@@ -1,6 +1,7 @@
 package com.danlju.tulip.infrastructure.db;
 
 import com.danlju.tulip.domain.User;
+import com.danlju.tulip.infrastructure.db.entity.UserDbEntity;
 import com.danlju.tulip.repo.UserRepository;
 import org.springframework.stereotype.Repository;
 

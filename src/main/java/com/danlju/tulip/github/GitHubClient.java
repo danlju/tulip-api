@@ -1,6 +1,5 @@
 package com.danlju.tulip.github;
 
-import com.danlju.tulip.rest.ProjectController;
 import com.danlju.tulip.service.WorkflowRunsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
@@ -19,6 +20,8 @@ public class GitHubClient {
     private final RestTemplate restTemplate;
     private final String token;
 
+    private final String BASE_URL = "https://api.github.com/repos";
+
     // TODO: pass each user's token with the api calls
     public GitHubClient(@Value("${GITHUB_TOKEN:}") String token) {
         if (token == null || token.isBlank()) {
@@ -28,22 +31,27 @@ public class GitHubClient {
         this.restTemplate = new RestTemplate();
     }
 
-    public WorkflowRunsService.WorkflowRunsResponse getWorkflowRuns(String owner, String repo) { // TODO: add token
-        String url = "https://api.github.com/repos/" + owner + "/" + repo + "/actions/runs";
+    public WorkflowRunsService.WorkflowRunsResponse getWorkflowRuns(String owner, String repo, Instant lastUpdated) { // TODO: add token
+        String url = BASE_URL + "/" + owner + "/" + repo + "/actions/runs";
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<String> entity = new HttpEntity<>(headers);
+
         ResponseEntity<WorkflowRunsService.WorkflowRunsResponse> response = restTemplate.exchange(url, HttpMethod.GET, entity, WorkflowRunsService.WorkflowRunsResponse.class);
+
         return response.getBody();
     }
 
     public ResponseEntity<HttpStatusCode> startWorkflowRun(String owner, String repo, String workflowId, String branch) {
-        String url = "https://api.github.com/repos/" + owner + "/" + repo + "/actions/workflows/" + workflowId + "/dispatches";
+        String url = BASE_URL + "/" + owner + "/" + repo + "/actions/workflows/" + workflowId + "/dispatches";
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<Map<String, String>> entity = new HttpEntity<>(Map.of("ref", branch), headers);
+
         return restTemplate.exchange(url,
                 HttpMethod.POST,
                 entity,

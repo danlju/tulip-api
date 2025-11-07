@@ -1,4 +1,4 @@
-package com.danlju.tulip.infrastructure.db;
+package com.danlju.tulip.infrastructure.db.entity;
 
 import com.danlju.tulip.domain.User;
 import jakarta.persistence.*;

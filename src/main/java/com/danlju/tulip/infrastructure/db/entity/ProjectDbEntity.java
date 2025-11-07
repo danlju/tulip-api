@@ -1,20 +1,36 @@
-package com.danlju.tulip.domain;
+package com.danlju.tulip.infrastructure.db.entity;
+
+import com.danlju.tulip.domain.Project;
+import jakarta.persistence.*;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public class Project {
+@Entity
+@Table(name = "projects")
+public class ProjectDbEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private UUID publicId;
+    @Column(unique = true)
     private String name;
+    @Column(unique = true)
     private String githubName;
     private Integer totalRuns;
     private Instant mostRecentBuild;
     private String mostRecentBuildStatus;
     private Instant lastSyncedAt;
 
-    public Project(Integer id, UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public ProjectDbEntity() {
+    }
+
+    public ProjectDbEntity(Integer id) {
+        this.id = id;
+    }
+
+    public ProjectDbEntity(Integer id, UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.id = id;
         this.publicId = publicId;
         this.name = name;
@@ -25,7 +41,7 @@ public class Project {
         this.lastSyncedAt = lastSyncedAt;
     }
 
-    public Project(UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public ProjectDbEntity(UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.publicId = publicId;
         this.name = name;
         this.githubName = githubName;
@@ -97,5 +113,33 @@ public class Project {
 
     public void setLastSyncedAt(Instant lastSyncedAt) {
         this.lastSyncedAt = lastSyncedAt;
+    }
+
+    public static ProjectDbEntity fromProject(Project project) {
+        if (project == null) {
+            return null;
+        }
+        return new ProjectDbEntity(
+                project.getId(),
+                project.getPublicId(),
+                project.getName(),
+                project.getGithubName(),
+                project.getTotalRuns(),
+                project.getMostRecentBuild(),
+                project.getMostRecentBuildStatus(),
+                project.getLastSyncedAt());
+    }
+
+    public static Project toProject(ProjectDbEntity dbEntity) {
+        if (dbEntity == null)  {
+            return null;
+        }
+        return new Project(dbEntity.id, dbEntity.publicId,
+                dbEntity.name,
+                dbEntity.githubName,
+                dbEntity.totalRuns,
+                dbEntity.mostRecentBuild,
+                dbEntity.mostRecentBuildStatus,
+                dbEntity.lastSyncedAt);
     }
 }

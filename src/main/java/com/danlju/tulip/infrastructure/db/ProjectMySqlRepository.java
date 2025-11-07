@@ -1,6 +1,7 @@
 package com.danlju.tulip.infrastructure.db;
 
 import com.danlju.tulip.domain.Project;
+import com.danlju.tulip.infrastructure.db.entity.ProjectDbEntity;
 import com.danlju.tulip.repo.ProjectRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,6 +26,13 @@ public class ProjectMySqlRepository implements ProjectRepository {
     }
 
     @Override
+    public Project getByGithubName(String githubName) {
+        return ProjectDbEntity.toProject(
+                projectCrudRepository.getByGithubName(githubName)
+        );
+    }
+
+    @Override
     public Project save(Project project) {
         return ProjectDbEntity.toProject(
                 projectCrudRepository.save(
@@ -44,5 +52,11 @@ public class ProjectMySqlRepository implements ProjectRepository {
         var projects = new ArrayList<ProjectDbEntity>();
         projectCrudRepository.findAll().iterator().forEachRemaining(projects::add);
         return projects.stream().map(ProjectDbEntity::toProject).toList();
+    }
+
+    @Override
+    public Project findMostRecentSync(String githubName) {
+        var projectEntity = projectCrudRepository.findMostRecentSync(githubName);
+        return ProjectDbEntity.toProject(projectEntity);
     }
 }

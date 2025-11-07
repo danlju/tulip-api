@@ -1,0 +1,76 @@
+package com.danlju.tulip.service;
+
+import com.danlju.tulip.domain.Build;
+import com.danlju.tulip.github.GitHubClient;
+import com.danlju.tulip.repo.BuildRepository;
+import com.danlju.tulip.repo.ProjectRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Service
+public class BuildService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BuildService.class);
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private GitHubClient gitHubClient;
+
+    @Autowired
+    private BuildRepository buildRepository;
+
+    public BuildService(ProjectRepository projectRepository, GitHubClient gitHubClient, BuildRepository buildRepository) {
+        this.projectRepository = projectRepository;
+        this.gitHubClient = gitHubClient;
+        this.buildRepository = buildRepository;
+    }
+
+    public Build saveBuild(BuildModel buildModel) {
+        return null;
+    }
+
+    public void syncBuilds(String owner, String repo) {
+        // TODO: move out from method and use as a parameter?
+        var project = projectRepository.findMostRecentSync(repo);
+
+        var runs = gitHubClient.getWorkflowRuns(owner, repo, project.getLastSyncedAt());
+
+        logger.info("Found {} builds", runs.workflowRuns().size());
+
+        for (var run : runs.workflowRuns()) {
+            var build = buildRepository.findByExternalId(String.valueOf(run.id()));
+            if (build == null) {
+                logger.info("No Build found with external ID: {}", run.workflowId());
+                buildRepository.save(
+                        new Build(
+                                UUID.randomUUID(),
+                                String.valueOf(run.id()),
+                                project.getId(),
+                                Integer.parseInt(run.runNumber()),
+                                run.commitHash(),
+                                run.headBranch(),
+                                run.status(),
+                                Instant.now(),
+                                Instant.now()
+                        ));
+            } else if (build.getUpdatedAt().isAfter(project.getLastSyncedAt())) {
+                logger.info("Syncing build in database for external ID: {}", build.getExternalId());
+                Instant newUpdatedTime = Instant.now();
+
+                build.setStatus(run.status());
+                build.setUpdatedAt(newUpdatedTime);
+                buildRepository.save(build);
+
+                project.setLastSyncedAt(newUpdatedTime);
+                projectRepository.save(project);
+            }
+        }
+    }
+}

@@ -20,12 +20,12 @@ public class WorkflowRunsService {
 
     @Cacheable(value = "workflowRuns", key = "#repo")
     public WorkflowRunsResponse getWorkflowRuns(String owner, String repo) {
-        return gitHubClient.getWorkflowRuns(owner, repo);
+        return gitHubClient.getWorkflowRuns(owner, repo, null);
     }
 
     @CachePut(value = "workflowRuns", key = "#repo")
     public WorkflowRunsResponse refreshWorkflowRuns(String owner, String repo) {
-        return gitHubClient.getWorkflowRuns(owner, repo);
+        return gitHubClient.getWorkflowRuns(owner, repo, null);
     }
 
     public ResponseEntity<HttpStatusCode> startWorkflowRun(String owner, String repo, String workflowId, String branch) {
@@ -35,6 +35,14 @@ public class WorkflowRunsService {
                 workflowId,
                 branch
         );
+    }
+
+    public record Repository(
+            long id,
+            String node_id,
+            String name,
+            String full_name
+    ) {
     }
 
     public record WorkflowRunsResponse(
@@ -57,7 +65,7 @@ public class WorkflowRunsService {
             @JsonProperty("head_branch") String headBranch,
             @JsonProperty("display_title") String displayTitle,
             @JsonProperty("run_number") String runNumber,
-            ProjectController.Repository repository
+            WorkflowRunsService.Repository repository
     ) {}
 }
 
