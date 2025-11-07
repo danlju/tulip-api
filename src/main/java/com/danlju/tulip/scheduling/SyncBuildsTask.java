@@ -15,13 +15,15 @@ public class SyncBuildsTask {
 
     private static Logger logger = LoggerFactory.getLogger(SyncBuildsTask.class);
 
+    public static final long SYNC_RATE_MS = 30000;
+
     @Autowired
     private BuildService buildService;
 
     @Autowired
     private ProjectRepository projectRepository;
 
-    @Scheduled(fixedRate = 20000)
+    @Scheduled(fixedRate = SYNC_RATE_MS)
     public void syncBuilds() {
         var projects = projectRepository.findAll();
 

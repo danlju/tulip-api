@@ -1,6 +1,7 @@
 package com.danlju.tulip.service;
 
 import com.danlju.tulip.domain.Project;
+import com.danlju.tulip.scheduling.SyncBuildsTask;
 import com.danlju.tulip.utils.Utils;
 import com.danlju.tulip.domain.Build;
 import com.danlju.tulip.github.GitHubClient;
@@ -12,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.UUID;
 
 @Service
@@ -42,13 +46,12 @@ public class BuildService {
         // TODO: move out from method and use as a parameter?
         var project = projectRepository.findByGithubName(repo);
 
-        var runs = gitHubClient.getAllBuilds(owner, repo, project.getLastSyncedAt());
+        var runs = gitHubClient.getAllBuilds(owner, repo, project.getLastSyncedAt().minus(SyncBuildsTask.SYNC_RATE_MS, ChronoUnit.MILLIS));
 
         logger.info("Found {} builds", runs.workflowRuns().size());
 
         Instant lastSynced = Instant.now();
         for (var run : runs.workflowRuns()) {
-
             var build = buildRepository.findByExternalId(String.valueOf(run.id()));
 
             if (build == null) {
