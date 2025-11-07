@@ -56,7 +56,7 @@ public class BuildService {
 
             if (build == null) {
                 buildRepository.save(mapRun(run, project));
-            } else if (Instant.parse(run.updatedAt()).isBefore(project.getLastSyncedAt())) {
+            } else if (Instant.parse(run.updatedAt()).isAfter(project.getLastSyncedAt())) {
                 logger.info("Syncing build in database for external ID: {}", build.getExternalId());
                 build.setStatus(run.status());
                 build.setUpdatedAt(Instant.parse(run.updatedAt()));
