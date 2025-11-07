@@ -53,19 +53,23 @@ class BuildServiceTest {
                         Instant.parse("2025-11-07T05:08:00Z")
                 )
         );
+
+        // Existing and up to date
         when(buildRepository.findByExternalId(eq("2001"))).thenReturn(
             new Build(10, UUID.randomUUID(), "2001", 1001, 1, "commit", "branch", "success", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:07:00Z"))
         );
+        // Existing but more recent updated date -> should be synced with database
         when(buildRepository.findByExternalId(eq("2002"))).thenReturn(
             new Build(11, UUID.randomUUID(), "2002", 1001, 1, "commit", "branch", "in progress", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:09:00Z"))
         );
+        // Non-existing -> should be saved in database
         when(buildRepository.findByExternalId(eq("2003"))).thenReturn(
-            new Build(12, UUID.randomUUID(), "2003", 1001, 1, "commit", "branch", "pending", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:08:00Z"))
+            null
         );
 
         buildService.syncBuilds("danlju", "test-repo");
 
-        verify(buildRepository, times(1)).save(any());
+        verify(buildRepository, times(2)).save(any());
     }
 
     private WorkflowRunsService.WorkflowRunsResponse mockResponse() {
@@ -73,12 +77,12 @@ class BuildServiceTest {
 
         runs.add(
                 new WorkflowRunsService.WorkflowRun(
-                        10L,
+                        2001L,
                         "Build",
                         "event",
                         "status",
                         "conclusion",
-                        2001L,
+                        1001L,
                         "2025-11-07T05:00:00",
                         "2025-11-07T05:01:00",
                         "url",
@@ -98,12 +102,12 @@ class BuildServiceTest {
 
         runs.add(
                 new WorkflowRunsService.WorkflowRun(
-                        11L,
+                        2002L,
                         "Build",
                         "event",
                         "success",
                         "conclusion",
-                        2002L,
+                        1001L,
                         "2025-11-07T05:00:00",
                         "2025-11-07T05:10:00",
                         "url",
@@ -123,12 +127,12 @@ class BuildServiceTest {
 
         runs.add(
                 new WorkflowRunsService.WorkflowRun(
-                        12L,
+                        2003L,
                         "Build",
                         "event",
                         "status",
                         "conclusion",
-                        2003L,
+                        1001L,
                         "2025-11-07T05:10:00",
                         "2025-11-07T05:15:00",
                         "url",
