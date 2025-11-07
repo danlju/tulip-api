@@ -47,20 +47,19 @@ public class BuildService {
         logger.info("Found {} builds", runs.workflowRuns().size());
 
         for (var run : runs.workflowRuns()) {
+
             var build = buildRepository.findByExternalId(String.valueOf(run.id()));
 
             if (build == null) {
-                logger.info("No Build found with external ID: {}", run.workflowId());
                 buildRepository.save(mapRun(run, project));
             } else if (build.getUpdatedAt().isAfter(project.getLastSyncedAt())) {
                 logger.info("Syncing build in database for external ID: {}", build.getExternalId());
                 Instant newUpdatedTime = Instant.now();
                 build.setStatus(run.status());
-                build.setUpdatedAt(newUpdatedTime);
+                build.setUpdatedAt(Instant.parse(run.updatedAt()));
                 buildRepository.save(build);
             }
             if (Instant.parse(run.updatedAt()).isAfter(project.getMostRecentBuild())) {
-                logger.info("Updating project most recent build");
                 project.setMostRecentBuild(Instant.parse(run.updatedAt()));
                 project.setMostRecentBuildStatus(Utils.mapGithubStatus(run.conclusion(), run.status()));
             }
