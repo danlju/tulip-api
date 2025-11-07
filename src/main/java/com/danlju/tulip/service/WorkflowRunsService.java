@@ -1,7 +1,6 @@
 package com.danlju.tulip.service;
 
 import com.danlju.tulip.github.GitHubClient;
-import com.danlju.tulip.rest.ProjectController;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
@@ -20,16 +19,16 @@ public class WorkflowRunsService {
 
     @Cacheable(value = "workflowRuns", key = "#repo")
     public WorkflowRunsResponse getWorkflowRuns(String owner, String repo) {
-        return gitHubClient.getWorkflowRuns(owner, repo, null);
+        return gitHubClient.getAllBuilds(owner, repo, null);
     }
 
     @CachePut(value = "workflowRuns", key = "#repo")
     public WorkflowRunsResponse refreshWorkflowRuns(String owner, String repo) {
-        return gitHubClient.getWorkflowRuns(owner, repo, null);
+        return gitHubClient.getAllBuilds(owner, repo, null);
     }
 
     public ResponseEntity<HttpStatusCode> startWorkflowRun(String owner, String repo, String workflowId, String branch) {
-        return gitHubClient.startWorkflowRun(
+        return gitHubClient.startBuild(
                 owner,
                 repo,
                 workflowId,

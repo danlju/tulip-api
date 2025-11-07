@@ -9,11 +9,9 @@ public interface ProjectRepository {
 
     Project getByPublicId(UUID id);
 
-    Project getByGithubName(String githubName);
+    Project findByGithubName(String githubName);
 
     Project save(Project project);
 
     List<Project> findAll();
-
-    Project findMostRecentSync(String githubName);
 }

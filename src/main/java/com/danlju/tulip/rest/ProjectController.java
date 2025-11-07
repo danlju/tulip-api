@@ -1,6 +1,6 @@
 package com.danlju.tulip.rest;
 
-import com.danlju.tulip.Utils;
+import com.danlju.tulip.utils.Utils;
 import com.danlju.tulip.domain.Project;
 import com.danlju.tulip.repo.ProjectRepository;
 import com.danlju.tulip.rest.model.ProjectModel;

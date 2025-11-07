@@ -38,10 +38,10 @@ class BuildServiceTest {
 
     @Test
     public void should_sync_builds() {
-        when(gitHubClient.getWorkflowRuns(eq("danlju"), eq("test-repo"), any(Instant.class))).thenReturn(
+        when(gitHubClient.getAllBuilds(eq("danlju"), eq("test-repo"), any(Instant.class))).thenReturn(
             mockResponse()
         );
-        when(projectRepository.findMostRecentSync("test-repo")).thenReturn(
+        when(projectRepository.findByGithubName("test-repo")).thenReturn(
                 new Project(
                         1001,
                         UUID.randomUUID(),
@@ -83,8 +83,8 @@ class BuildServiceTest {
                         "status",
                         "conclusion",
                         1001L,
-                        "2025-11-07T05:00:00",
-                        "2025-11-07T05:01:00",
+                        "2025-11-07T05:00:00Z",
+                        "2025-11-07T05:01:00Z",
                         "url",
                         "htmlUrl",
                         "commit",
@@ -108,8 +108,8 @@ class BuildServiceTest {
                         "success",
                         "conclusion",
                         1001L,
-                        "2025-11-07T05:00:00",
-                        "2025-11-07T05:10:00",
+                        "2025-11-07T05:00:00Z",
+                        "2025-11-07T05:10:00Z",
                         "url",
                         "htmlUrl",
                         "commit",
@@ -133,8 +133,8 @@ class BuildServiceTest {
                         "status",
                         "conclusion",
                         1001L,
-                        "2025-11-07T05:10:00",
-                        "2025-11-07T05:15:00",
+                        "2025-11-07T05:10:00Z",
+                        "2025-11-07T05:15:00Z",
                         "url",
                         "htmlUrl",
                         "commit",

@@ -1,5 +1,6 @@
 package com.danlju.tulip.github;
 
+import com.danlju.tulip.builds.BuildClient;
 import com.danlju.tulip.service.WorkflowRunsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Component
-public class GitHubClient {
+public class GitHubClient implements BuildClient {
 
     private static final Logger logger = LoggerFactory.getLogger(GitHubClient.class);
 
@@ -31,8 +32,16 @@ public class GitHubClient {
         this.restTemplate = new RestTemplate();
     }
 
-    public WorkflowRunsService.WorkflowRunsResponse getWorkflowRuns(String owner, String repo, Instant lastUpdated) { // TODO: add token
-        String url = BASE_URL + "/" + owner + "/" + repo + "/actions/runs";
+    public String createWorkflowWebhook(String owner, String repo) {
+        return "";
+    }
+
+    @Override
+    public WorkflowRunsService.WorkflowRunsResponse getAllBuilds(String owner, String repo, Instant lastUpdated) {
+        String url = BASE_URL + "/" + owner + "/" + repo + "/actions/runs?per_page=100";
+        if (lastUpdated != null) {
+            url += "&created_at=>=" + lastUpdated;
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
@@ -44,7 +53,8 @@ public class GitHubClient {
         return response.getBody();
     }
 
-    public ResponseEntity<HttpStatusCode> startWorkflowRun(String owner, String repo, String workflowId, String branch) {
+    @Override
+    public ResponseEntity<HttpStatusCode> startBuild(String owner, String repo, String workflowId, String branch) {
         String url = BASE_URL + "/" + owner + "/" + repo + "/actions/workflows/" + workflowId + "/dispatches";
 
         HttpHeaders headers = new HttpHeaders();
@@ -56,12 +66,6 @@ public class GitHubClient {
                 HttpMethod.POST,
                 entity,
                 HttpStatusCode.class
-                ); // TODO: how to handle response?
+        ); // TODO: how to handle response?
     }
-
-    // TODO: create webhook for workflow status changes
-    public String createWorkflowWebhook(String owner, String repo) {
-        return "";
-    }
-
 }

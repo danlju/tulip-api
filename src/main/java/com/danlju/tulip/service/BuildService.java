@@ -1,6 +1,7 @@
 package com.danlju.tulip.service;
 
-import com.danlju.tulip.Utils;
+import com.danlju.tulip.domain.Project;
+import com.danlju.tulip.utils.Utils;
 import com.danlju.tulip.domain.Build;
 import com.danlju.tulip.github.GitHubClient;
 import com.danlju.tulip.repo.BuildRepository;
@@ -39,9 +40,9 @@ public class BuildService {
 
     public void syncBuilds(String owner, String repo) {
         // TODO: move out from method and use as a parameter?
-        var project = projectRepository.findMostRecentSync(repo);
+        var project = projectRepository.findByGithubName(repo);
 
-        var runs = gitHubClient.getWorkflowRuns(owner, repo, project.getLastSyncedAt());
+        var runs = gitHubClient.getAllBuilds(owner, repo, project.getLastSyncedAt());
 
         logger.info("Found {} builds", runs.workflowRuns().size());
 
@@ -50,26 +51,13 @@ public class BuildService {
 
             if (build == null) {
                 logger.info("No Build found with external ID: {}", run.workflowId());
-                var savedBuild = buildRepository.save(
-                        new Build(
-                                UUID.randomUUID(),
-                                String.valueOf(run.id()),
-                                project.getId(),
-                                Integer.parseInt(run.runNumber()),
-                                run.commitHash(),
-                                run.headBranch(),
-                                run.status(),
-                                Instant.parse(run.createdAt()),
-                                Instant.parse(run.updatedAt())
-                        ));
+                buildRepository.save(mapRun(run, project));
             } else if (build.getUpdatedAt().isAfter(project.getLastSyncedAt())) {
                 logger.info("Syncing build in database for external ID: {}", build.getExternalId());
                 Instant newUpdatedTime = Instant.now();
-
                 build.setStatus(run.status());
                 build.setUpdatedAt(newUpdatedTime);
                 buildRepository.save(build);
-
             }
             if (Instant.parse(run.updatedAt()).isAfter(project.getMostRecentBuild())) {
                 logger.info("Updating project most recent build");
@@ -79,5 +67,19 @@ public class BuildService {
         }
         project.setLastSyncedAt(Instant.now());
         projectRepository.save(project);
+    }
+
+    private Build mapRun(WorkflowRunsService.WorkflowRun run, Project project) {
+        return new Build(
+                UUID.randomUUID(),
+                String.valueOf(run.id()),
+                project.getId(),
+                Integer.parseInt(run.runNumber()),
+                run.commitHash(),
+                run.headBranch(),
+                run.status(),
+                Instant.parse(run.createdAt()),
+                Instant.parse(run.updatedAt())
+        );
     }
 }
