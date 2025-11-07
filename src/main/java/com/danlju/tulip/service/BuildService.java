@@ -56,10 +56,11 @@ public class BuildService {
 
             if (build == null) {
                 buildRepository.save(mapRun(run, project));
-            } else if (Instant.parse(run.updatedAt()).isAfter(project.getLastSyncedAt())) {
+            } else if (Instant.parse(run.updatedAt()).isBefore(project.getLastSyncedAt())) {
                 logger.info("Syncing build in database for external ID: {}", build.getExternalId());
                 build.setStatus(run.status());
                 build.setUpdatedAt(Instant.parse(run.updatedAt()));
+                project.setLastSyncedAt(Instant.parse(run.updatedAt()));
                 buildRepository.save(build);
             }
             if (Instant.parse(run.updatedAt()).isAfter(project.getMostRecentBuild())) {
@@ -67,7 +68,6 @@ public class BuildService {
                 project.setMostRecentBuildStatus(Utils.mapGithubStatus(run.conclusion(), run.status()));
             }
         }
-        project.setLastSyncedAt(lastSynced);
         projectRepository.save(project);
     }
 
