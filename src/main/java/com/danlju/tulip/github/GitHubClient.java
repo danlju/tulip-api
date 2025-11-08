@@ -68,4 +68,18 @@ public class GitHubClient implements BuildClient {
                 HttpStatusCode.class
         ); // TODO: how to handle response?
     }
+
+    @Override
+    public WorkflowRunsService.WorkflowRun getBuild(String owner, String repo, Integer buildId) {
+        String url = BASE_URL + "/" + owner + "/" + repo + "/";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + token);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<WorkflowRunsService.WorkflowRun> response = restTemplate.exchange(url, HttpMethod.GET, entity, WorkflowRunsService.WorkflowRun.class);
+
+        return response.getBody();
+    }
 }

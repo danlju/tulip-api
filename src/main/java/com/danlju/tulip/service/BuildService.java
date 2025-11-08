@@ -92,4 +92,9 @@ public class BuildService {
                 Instant.parse(run.updatedAt())
         );
     }
+
+    public Build getBuild(String owner, String repo, String buildId) {
+        var project = projectRepository.findByGithubName(repo);
+        return mapRun(gitHubClient.getBuild(owner, repo, Integer.parseInt(buildId)), project);
+    }
 }

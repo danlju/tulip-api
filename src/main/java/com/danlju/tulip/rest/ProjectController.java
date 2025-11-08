@@ -56,17 +56,23 @@ public class ProjectController {
         return "ok";
     }
 
-    @GetMapping("/projects/{repo}/refresh")
-    public BuildsResponseModel refreshWorkflowRuns(@PathVariable String repo) {
+    @GetMapping("/projects/{repo}/refresh") public BuildsResponseModel refreshWorkflowRuns(@PathVariable String repo) {
         //return toBuildsResponseModel(
           //      workflowRunsService.refreshWorkflowRuns("danlju", repo)
    //     );
         return null;
     }
 
+    @GetMapping("/projects/{repo}/builds/{buildId}")
+    public BuildsResponseModelBuild refreshWorkflowRuns(@PathVariable String repo, @PathVariable String buildId) {
+        var build = buildService.getBuild("danlju", repo, buildId);
+        return new BuildsResponseModelBuild(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(), build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", calculateDuration(build.getStartedAt(), build.getUpdatedAt()));
+    }
+
     @PostMapping(value = "/projects/{repo}/run", consumes = "application/json")
     public String startWorkflowRun(@RequestBody StartWorkflowRequest startWorkflowRequest) {
-        return workflowRunsService.startWorkflowRun(startWorkflowRequest.owner, startWorkflowRequest.projectId, startWorkflowRequest.workflowId, startWorkflowRequest.branch).toString();
+        // TODO: fix parameters
+        return workflowRunsService.startWorkflowRun("danlju", startWorkflowRequest.projectId, startWorkflowRequest.workflowId, startWorkflowRequest.branch).toString();
     }
 
     @PostMapping(value = "/projects", consumes = "application/json")
