@@ -95,6 +95,6 @@ public class BuildService {
 
     public Build getBuild(String owner, String repo, String buildId) {
         var project = projectRepository.findByGithubName(repo);
-        return mapRun(gitHubClient.getBuild(owner, repo, Integer.parseInt(buildId)), project);
+        return mapRun(gitHubClient.getBuild(owner, repo, Long.parseLong(buildId)), project);
     }
 }

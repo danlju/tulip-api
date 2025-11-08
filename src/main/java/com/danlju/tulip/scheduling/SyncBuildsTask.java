@@ -1,5 +1,6 @@
 package com.danlju.tulip.scheduling;
 
+import com.danlju.tulip.config.TulipConfig;
 import com.danlju.tulip.domain.Project;
 import com.danlju.tulip.repo.ProjectRepository;
 import com.danlju.tulip.service.BuildService;
@@ -15,7 +16,7 @@ public class SyncBuildsTask {
 
     private static Logger logger = LoggerFactory.getLogger(SyncBuildsTask.class);
 
-    public static final long SYNC_RATE_MS = 60000;
+    public static final long SYNC_RATE_MS = 25000;
 
     @Autowired
     private BuildService buildService;
@@ -23,8 +24,12 @@ public class SyncBuildsTask {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private TulipConfig tulipConfig;
+
     @Scheduled(fixedRate = SYNC_RATE_MS)
     public void syncBuilds() {
+        logger.info("Github account from config: {}", tulipConfig.getGithubProperties().getAccount());
         var projects = projectRepository.findAll();
 
         for (Project project : projects) {

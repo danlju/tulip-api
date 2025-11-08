@@ -70,8 +70,10 @@ public class GitHubClient implements BuildClient {
     }
 
     @Override
-    public WorkflowRunsService.WorkflowRun getBuild(String owner, String repo, Integer buildId) {
-        String url = BASE_URL + "/" + owner + "/" + repo + "/";
+    public WorkflowRunsService.WorkflowRun getBuild(String owner, String repo, Long buildId) {
+        // /repos/{owner}/{repo}/actions/runs/{run_id}
+        // /repos/danlju/tulip-api/runs/19185947627
+        String url = BASE_URL + "/" + owner + "/" + repo + "/actions/runs/" + buildId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);

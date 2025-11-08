@@ -1,0 +1,6 @@
+tulip:
+  test: test1
+  github:
+    account: danlju
+  aws:
+    regions: us-east-1

@@ -1,5 +1,6 @@
 package com.danlju.tulip.rest;
 
+import com.danlju.tulip.config.TulipConfig;
 import com.danlju.tulip.domain.Build;
 import com.danlju.tulip.domain.Project;
 import com.danlju.tulip.repo.ProjectRepository;
@@ -10,14 +11,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,44 +33,33 @@ public class ProjectController {
     @Autowired
     private BuildService buildService;
 
+    @Autowired
+    private TulipConfig tulipConfig;
+
     @GetMapping("/projects")
-    public ResponseEntity<List<ProjectModel>> list() {
+    public List<ProjectModel> list() {
         List<Project> projects = projectRepository.findAll();
-        var models = projects.stream().map(this::toModel).collect(Collectors.toList());
-        return new ResponseEntity<>(models, HttpStatus.OK);
+        return projects.stream().map(this::toModel).collect(Collectors.toList());
     }
 
     @GetMapping("/projects/{repo}")
     public List<BuildsResponseModelBuild> getWorkflowRuns(@PathVariable String repo) {
-        var builds = buildService.getBuildsForProject("danlju", repo);
+        var builds = buildService.getBuildsForProject(tulipConfig.getGithubProperties().getAccount(), repo);
 
         return toBuildsResponseModel(builds);
     }
 
-    @GetMapping("/projects/sync")
-    public String sync() {
-        buildService.syncBuilds("danlju", "tulip-api");
-
-        return "ok";
-    }
-
-    @GetMapping("/projects/{repo}/refresh") public BuildsResponseModel refreshWorkflowRuns(@PathVariable String repo) {
-        //return toBuildsResponseModel(
-          //      workflowRunsService.refreshWorkflowRuns("danlju", repo)
-   //     );
-        return null;
-    }
-
     @GetMapping("/projects/{repo}/builds/{buildId}")
     public BuildsResponseModelBuild refreshWorkflowRuns(@PathVariable String repo, @PathVariable String buildId) {
-        var build = buildService.getBuild("danlju", repo, buildId);
-        return new BuildsResponseModelBuild(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(), build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", calculateDuration(build.getStartedAt(), build.getUpdatedAt()));
+        return toBuildResponseModel(
+                buildService.getBuild(tulipConfig.getGithubProperties().getAccount(), repo, buildId)
+        );
     }
 
     @PostMapping(value = "/projects/{repo}/run", consumes = "application/json")
     public String startWorkflowRun(@RequestBody StartWorkflowRequest startWorkflowRequest) {
         // TODO: fix parameters
-        return workflowRunsService.startWorkflowRun("danlju", startWorkflowRequest.projectId, startWorkflowRequest.workflowId, startWorkflowRequest.branch).toString();
+        return workflowRunsService.startWorkflowRun(tulipConfig.getGithubProperties().getAccount(), startWorkflowRequest.projectId, startWorkflowRequest.workflowId, startWorkflowRequest.branch).toString();
     }
 
     @PostMapping(value = "/projects", consumes = "application/json")
@@ -81,6 +68,10 @@ public class ProjectController {
         projectRepository.save(new Project(UUID.randomUUID(), model.name, model.githubName, 10, Instant.ofEpochMilli(0), "unknown", Instant.ofEpochMilli(0)));
 
         return "ok";
+    }
+
+    private BuildsResponseModelBuild toBuildResponseModel(Build build) {
+        return new BuildsResponseModelBuild(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(), build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", calculateDuration(build.getStartedAt(), build.getUpdatedAt()));
     }
 
     private ProjectModel toModel(Project project) {
@@ -112,27 +103,6 @@ public class ProjectController {
         }
 
         return duration + " " + m +"m";
-    }
-
-    private String mapStatus(String conclusion, String status) {
-        if (conclusion == null || conclusion.isBlank()) {
-            if (Objects.equals(status, "failed")) {
-                return "failure";
-            } else if (Objects.equals(status, "in_progress")) {
-                return "running";
-            } else if (
-                    Objects.equals(status, "waiting")
-                            || Objects.equals(status, "queued")
-                            || Objects.equals(status, "requested")) {
-                return "pending";
-            }
-        } else if (conclusion.equals("failure")) {
-            return "failure";
-        } else if (conclusion.equals("success")) {
-            return "success";
-        }
-
-        return "unknown";
     }
 
     public record StartWorkflowRequest(

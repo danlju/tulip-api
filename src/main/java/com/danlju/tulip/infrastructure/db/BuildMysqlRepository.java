@@ -25,7 +25,6 @@ public class BuildMysqlRepository implements BuildRepository {
     @Override
     public Build save(Build build) {
         var entityToSave = BuildDbEntity.toEntity(build);
-        logger.info("Saving: {}", entityToSave.toString());
         var entity = buildCrudRepository.save(entityToSave);
         return BuildDbEntity.toBuild(entity);
     }
