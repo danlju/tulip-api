@@ -56,11 +56,11 @@ class BuildServiceTest {
 
         // Existing and up to date
         when(buildRepository.findByExternalId(eq("2001"))).thenReturn(
-            new Build(10, UUID.randomUUID(), "2001", 1001, 1, "commit", "branch", "success", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:07:00Z"))
+            new Build(10, UUID.randomUUID(), "2001", 1001, 1, "commit", "commitMessage", "branch", "success", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:07:00Z"))
         );
         // Existing but more recent updated date -> should be synced with database
         when(buildRepository.findByExternalId(eq("2002"))).thenReturn(
-            new Build(11, UUID.randomUUID(), "2002", 1001, 1, "commit", "branch", "in progress", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:09:00Z"))
+            new Build(11, UUID.randomUUID(), "2002", 1001, 1, "commit", "commitMessage", "branch", "in progress", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:09:00Z"))
         );
         // Non-existing -> should be saved in database
         when(buildRepository.findByExternalId(eq("2003"))).thenReturn(
@@ -96,7 +96,8 @@ class BuildServiceTest {
                                 "rnode_id",
                                 "rname",
                                 "rfull_name"
-                        )
+                        ),
+                        new WorkflowRunsService.Actor("theUser")
                 )
         );
 

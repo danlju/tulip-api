@@ -12,7 +12,7 @@ public class CacheConfig {
 
     @Bean
     public CaffeineCacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("workflowRuns");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("builds");
         cacheManager.setCaffeine(
                 Caffeine.newBuilder()
                         .expireAfterWrite(Duration.ofSeconds(30))

@@ -2,6 +2,7 @@ package com.danlju.tulip.repo;
 
 import com.danlju.tulip.domain.Build;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface BuildRepository {
@@ -9,4 +10,5 @@ public interface BuildRepository {
     Build findById(Integer id);
     Build findByPublicId(UUID id);
     Build findByExternalId(String externalId);
+    List<Build> findByProjectId(Integer id);
 }

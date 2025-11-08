@@ -44,6 +44,9 @@ public class WorkflowRunsService {
     ) {
     }
 
+    public record Actor(String login) {
+    }
+
     public record WorkflowRunsResponse(
             @JsonProperty("total_count") int totalCount,
             @JsonProperty("workflow_runs") List<WorkflowRun> workflowRuns
@@ -64,7 +67,8 @@ public class WorkflowRunsService {
             @JsonProperty("head_branch") String headBranch,
             @JsonProperty("display_title") String displayTitle,
             @JsonProperty("run_number") String runNumber,
-            WorkflowRunsService.Repository repository
+            WorkflowRunsService.Repository repository,
+            Actor actor
     ) {}
 }
 

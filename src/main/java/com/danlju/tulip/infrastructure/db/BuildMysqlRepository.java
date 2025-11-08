@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -45,5 +46,11 @@ public class BuildMysqlRepository implements BuildRepository {
     public Build findByExternalId(String externalId) {
         var entity = buildCrudRepository.findByExternalId(externalId);
         return BuildDbEntity.toBuild(entity);
+    }
+
+    @Override
+    public List<Build> findByProjectId(Integer id) {
+        var builds = buildCrudRepository.findByProjectId(id);
+        return builds.stream().map(BuildDbEntity::toBuild).toList();
     }
 }

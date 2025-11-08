@@ -1,6 +1,6 @@
 package com.danlju.tulip.rest;
 
-import com.danlju.tulip.utils.Utils;
+import com.danlju.tulip.domain.Build;
 import com.danlju.tulip.domain.Project;
 import com.danlju.tulip.repo.ProjectRepository;
 import com.danlju.tulip.rest.model.ProjectModel;
@@ -43,14 +43,9 @@ public class ProjectController {
     }
 
     @GetMapping("/projects/{repo}")
-    public BuildsResponseModel getWorkflowRuns(@PathVariable String repo) {
-        var builds = workflowRunsService.getWorkflowRuns("danlju", repo);
-//
-//        if (!builds.workflowRuns().isEmpty()) {
-//            var run = builds.workflowRuns().get(0);
-//            run.
-//        }
-//        projectService.updateProjectInfo();
+    public List<BuildsResponseModelBuild> getWorkflowRuns(@PathVariable String repo) {
+        var builds = buildService.getBuildsForProject("danlju", repo);
+
         return toBuildsResponseModel(builds);
     }
 
@@ -63,9 +58,10 @@ public class ProjectController {
 
     @GetMapping("/projects/{repo}/refresh")
     public BuildsResponseModel refreshWorkflowRuns(@PathVariable String repo) {
-        return toBuildsResponseModel(
-                workflowRunsService.refreshWorkflowRuns("danlju", repo)
-        );
+        //return toBuildsResponseModel(
+          //      workflowRunsService.refreshWorkflowRuns("danlju", repo)
+   //     );
+        return null;
     }
 
     @PostMapping(value = "/projects/{repo}/run", consumes = "application/json")
@@ -85,19 +81,31 @@ public class ProjectController {
         return new ProjectModel(project.getId().toString(), project.getPublicId().toString(), project.getName(), project.getGithubName());
     }
 
-    private BuildsResponseModel toBuildsResponseModel(WorkflowRunsService.WorkflowRunsResponse response) {
-        return new BuildsResponseModel(response.totalCount(), toBuildsResponseModel(response.workflowRuns()));
-    }
-
-    private List<BuildsResponseModelBuild> toBuildsResponseModel(List<WorkflowRunsService.WorkflowRun> workflowRuns) {
+    private List<BuildsResponseModelBuild> toBuildsResponseModel(List<Build> workflowRuns) {
         List<BuildsResponseModelBuild> builds = new ArrayList<>();
-        for (WorkflowRunsService.WorkflowRun run : workflowRuns) {
+        for (Build build : workflowRuns) {
             builds.add(
-                    new BuildsResponseModelBuild(run.id(), run.name(), Utils.mapGithubStatus(run.conclusion(), run.status()), run.commitHash(), run.headBranch(), run.runNumber(), run.displayTitle())
+                    new BuildsResponseModelBuild(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(),build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", calculateDuration(build.getStartedAt(), build.getUpdatedAt()))
             );
         }
 
         return builds;
+    }
+
+    private String calculateDuration(Instant startedAt, Instant updatedAt) {
+        long seconds = updatedAt.getEpochSecond() - startedAt.getEpochSecond();
+        if (seconds < 60) {
+            return seconds + "s";
+        }
+        long h = seconds / 60;
+        long m = seconds / 60 % 60;
+
+        String duration = "";
+        if (h >0) {
+            duration += h + "h";
+        }
+
+        return duration + " " + m +"m";
     }
 
     private String mapStatus(String conclusion, String status) {
@@ -136,7 +144,6 @@ public class ProjectController {
     ) {
     }
 
-
     public record BuildsResponseModel(
             @JsonProperty("total_count") int totalCount,
             @JsonProperty("builds") List<BuildsResponseModelBuild> builds
@@ -147,19 +154,31 @@ public class ProjectController {
         public long id;
         public String name;
         public String status;
+        public String startedByUser;
         public String commit;
         public String branch;
         public String runNumber;
         public String displayTitle;
+        public String duration;
 
-        public BuildsResponseModelBuild(long id, String name, String status, String commit, String branch, String runNumber, String displayTitle) {
+        public BuildsResponseModelBuild(long id,
+                                        String name,
+                                        String status,
+                                        String startedByUser,
+                                        String commit,
+                                        String branch,
+                                        String runNumber,
+                                        String displayTitle,
+                                        String duration) {
             this.id = id;
             this.name = name;
             this.status = status;
+            this.startedByUser = startedByUser;
             this.commit = commit;
             this.branch = branch;
             this.runNumber = runNumber;
             this.displayTitle = displayTitle;
+            this.duration = duration;
         }
     }
 }

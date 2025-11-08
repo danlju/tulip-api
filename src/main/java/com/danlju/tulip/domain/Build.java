@@ -9,32 +9,38 @@ public class Build {
     private UUID publicId;
     private String externalId;
     private Integer projectId;
+    private String startedByUser;
     private Integer number;
     private String commit;
+    private String commitMessage;
     private String branch;
     private String status;
     private Instant startedAt;
     private Instant updatedAt;
 
-    public Build(Integer id, UUID publicId, String externalId, Integer projectId, Integer number, String commit, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public Build(Integer id, UUID publicId, String externalId, Integer projectId, String startedByUser, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
         this.id = id;
         this.publicId = publicId;
         this.externalId = externalId;
         this.projectId = projectId;
+        this.startedByUser = startedByUser;
         this.number = number;
         this.commit = commit;
+        this.commitMessage = commitMessage;
         this.branch = branch;
         this.status = status;
         this.startedAt = startedAt;
         this.updatedAt = updatedAt;
     }
 
-    public Build(UUID publicId, String externalId, Integer projectId, Integer number, String commit, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public Build(UUID publicId, String externalId, Integer projectId, String startedByUser, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
         this.publicId = publicId;
         this.externalId = externalId;
         this.projectId = projectId;
+        this.startedByUser = startedByUser;
         this.number = number;
         this.commit = commit;
+        this.commitMessage = commitMessage;
         this.branch = branch;
         this.status = status;
         this.startedAt = startedAt;
@@ -55,6 +61,14 @@ public class Build {
 
     public void setProjectId(Integer projectId) {
         this.projectId = projectId;
+    }
+
+    public String getStartedByUser() {
+        return startedByUser;
+    }
+
+    public void setStartedByUser(String startedByUser) {
+        this.startedByUser = startedByUser;
     }
 
     public UUID getPublicId() {
@@ -83,6 +97,14 @@ public class Build {
 
     public String getCommit() {
         return commit;
+    }
+
+    public String getCommitMessage() {
+        return commitMessage;
+    }
+
+    public void setCommitMessage(String commitMessage) {
+        this.commitMessage = commitMessage;
     }
 
     public void setCommit(String commit) {

@@ -18,10 +18,12 @@ public class BuildDbEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "project_id", nullable = false)
     private ProjectDbEntity project;
+    private String startedByUser;
     @Column(unique = true)
     private String externalId;
     private Integer number;
     private String commit;
+    private String commitMessage;
     private String branch;
     private String status;
     private Instant startedAt;
@@ -30,25 +32,30 @@ public class BuildDbEntity {
     public BuildDbEntity() {
     }
 
-    public BuildDbEntity(Integer id, UUID publicId, ProjectDbEntity project, String externalId, Integer number, String commit, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public BuildDbEntity(Integer id, UUID publicId, ProjectDbEntity project, String startedByUser, String externalId, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
         this.id = id;
         this.publicId = publicId;
         this.project = project;
+        this.startedByUser = startedByUser;
         this.externalId = externalId;
         this.number = number;
         this.commit = commit;
+        this.commitMessage = commitMessage;
         this.branch = branch;
         this.status = status;
         this.startedAt = startedAt;
         this.updatedAt = updatedAt;
     }
 
-    public BuildDbEntity(UUID publicId, ProjectDbEntity project, String externalId, Integer number, String commit, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public BuildDbEntity(UUID publicId, ProjectDbEntity project, String startedByUser, String externalId, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
         this.publicId = publicId;
         this.project = project;
+        this.startedByUser = startedByUser;
+        this.externalId = externalId;
         this.externalId = externalId;
         this.number = number;
         this.commit = commit;
+        this.commitMessage = commitMessage;
         this.branch = branch;
         this.status = status;
         this.startedAt = startedAt;
@@ -69,6 +76,22 @@ public class BuildDbEntity {
 
     public void setProject(ProjectDbEntity project) {
         this.project = project;
+    }
+
+    public String getStartedByUser() {
+        return startedByUser;
+    }
+
+    public void setStartedByUser(String startedByUser) {
+        this.startedByUser = startedByUser;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public UUID getPublicId() {
@@ -136,8 +159,10 @@ public class BuildDbEntity {
                 dbEntity.publicId,
                 dbEntity.externalId,
                 dbEntity.project.getId(),
+                dbEntity.startedByUser,
                 dbEntity.number,
                 dbEntity.commit,
+                dbEntity.commitMessage,
                 dbEntity.branch,
                 dbEntity.status,
                 dbEntity.startedAt,
@@ -154,9 +179,11 @@ public class BuildDbEntity {
                 build.getId(),
                 build.getPublicId(),
                 new ProjectDbEntity(build.getProjectId()),
+                build.getStartedByUser(),
                 build.getExternalId(),
                 build.getNumber(),
                 build.getCommit(),
+                build.getCommitMessage(),
                 build.getBranch(),
                 build.getStatus(),
                 build.getStartedAt(),

@@ -10,12 +10,12 @@ import com.danlju.tulip.repo.ProjectRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -42,6 +42,12 @@ public class BuildService {
         return null;
     }
 
+    @CachePut(value="builds", key="#repo")
+    public List<Build> getBuildsForProject(String owner, String repo) {
+        var project = projectRepository.findByGithubName(repo);
+        return buildRepository.findByProjectId(project.getId());
+    }
+
     public void syncBuilds(String owner, String repo) {
         // TODO: move out from method and use as a parameter?
         var project = projectRepository.findByGithubName(repo);
@@ -58,7 +64,7 @@ public class BuildService {
                 buildRepository.save(mapRun(run, project));
             } else if (Instant.parse(run.updatedAt()).isAfter(project.getLastSyncedAt())) {
                 logger.info("Syncing build in database for external ID: {}", build.getExternalId());
-                build.setStatus(run.status());
+                build.setStatus(Utils.mapGithubStatus(run.conclusion(), run.status()));
                 build.setUpdatedAt(Instant.parse(run.updatedAt()));
                 project.setLastSyncedAt(Instant.parse(run.updatedAt()));
                 buildRepository.save(build);
@@ -76,10 +82,12 @@ public class BuildService {
                 UUID.randomUUID(),
                 String.valueOf(run.id()),
                 project.getId(),
+                run.actor().login(),
                 Integer.parseInt(run.runNumber()),
                 run.commitHash(),
+                run.displayTitle(),
                 run.headBranch(),
-                run.status(),
+                Utils.mapGithubStatus(run.conclusion(), run.status()),
                 Instant.parse(run.createdAt()),
                 Instant.parse(run.updatedAt())
         );

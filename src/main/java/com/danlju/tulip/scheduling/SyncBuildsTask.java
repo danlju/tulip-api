@@ -15,7 +15,7 @@ public class SyncBuildsTask {
 
     private static Logger logger = LoggerFactory.getLogger(SyncBuildsTask.class);
 
-    public static final long SYNC_RATE_MS = 30000;
+    public static final long SYNC_RATE_MS = 60000;
 
     @Autowired
     private BuildService buildService;

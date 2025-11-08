@@ -7,6 +7,5 @@ import java.util.UUID;
 
 public interface ProjectCrudRepository extends CrudRepository<ProjectDbEntity, Integer> {
     ProjectDbEntity findByPublicId(UUID publicId);
-
     ProjectDbEntity getByGithubName(String githubName);
 }
