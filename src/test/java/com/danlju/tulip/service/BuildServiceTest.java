@@ -1,10 +1,12 @@
 package com.danlju.tulip.service;
 
-import com.danlju.tulip.domain.Build;
-import com.danlju.tulip.domain.Project;
+import com.danlju.tulip.application.service.BuildService;
+import com.danlju.tulip.application.service.WorkflowRunsService;
+import com.danlju.tulip.core.domain.Build;
+import com.danlju.tulip.core.domain.Project;
 import com.danlju.tulip.github.GitHubClient;
-import com.danlju.tulip.repo.BuildRepository;
-import com.danlju.tulip.repo.ProjectRepository;
+import com.danlju.tulip.application.repository.BuildRepository;
+import com.danlju.tulip.application.repository.ProjectRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,0 +1,105 @@
+package com.danlju.tulip.application.service;
+
+import com.danlju.tulip.core.domain.Project;
+import com.danlju.tulip.scheduling.SyncBuildsTask;
+import com.danlju.tulip.application.usecases.BuildUseCases;
+import com.danlju.tulip.utils.Utils;
+import com.danlju.tulip.core.domain.Build;
+import com.danlju.tulip.github.GitHubClient;
+import com.danlju.tulip.application.repository.BuildRepository;
+import com.danlju.tulip.application.repository.ProjectRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class BuildService implements BuildUseCases {
+
+    private static final Logger logger = LoggerFactory.getLogger(BuildService.class);
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private GitHubClient gitHubClient;
+
+    @Autowired
+    private BuildRepository buildRepository;
+
+    public BuildService(ProjectRepository projectRepository, GitHubClient gitHubClient, BuildRepository buildRepository) {
+        this.projectRepository = projectRepository;
+        this.gitHubClient = gitHubClient;
+        this.buildRepository = buildRepository;
+    }
+
+    @Override
+    public Build saveBuild(BuildModel buildModel) {
+        return null;
+    }
+
+    @CachePut(value = "builds", key = "#repo")
+    @Override
+    public List<Build> getBuildsForProject(String owner, String repo) {
+        var project = projectRepository.findByGithubName(repo);
+        return buildRepository.findByProjectId(project.getId());
+    }
+
+    @Override
+    public void syncBuilds(String owner, String repo) {
+        // TODO: move out from method and use as a parameter?
+        var project = projectRepository.findByGithubName(repo);
+
+        var runs = gitHubClient.getAllBuilds(owner, repo, project.getLastSyncedAt().minus(SyncBuildsTask.SYNC_RATE_MS, ChronoUnit.MILLIS));
+
+        logger.info("Found {} builds", runs.workflowRuns().size());
+
+        Instant lastSynced = Instant.now();
+        for (var run : runs.workflowRuns()) {
+            var build = buildRepository.findByExternalId(String.valueOf(run.id()));
+
+            if (build == null) {
+                buildRepository.save(mapRun(run, project));
+            } else if (Instant.parse(run.updatedAt()).isAfter(project.getLastSyncedAt())) {
+                logger.info("Syncing build in database for external ID: {}", build.getExternalId());
+                build.setStatus(Utils.mapGithubStatus(run.conclusion(), run.status()));
+                build.setUpdatedAt(Instant.parse(run.updatedAt()));
+                project.setLastSyncedAt(Instant.parse(run.updatedAt()));
+                buildRepository.save(build);
+            }
+            if (Instant.parse(run.updatedAt()).isAfter(project.getMostRecentBuild())) {
+                project.setMostRecentBuild(Instant.parse(run.updatedAt()));
+                project.setMostRecentBuildStatus(Utils.mapGithubStatus(run.conclusion(), run.status()));
+            }
+        }
+        projectRepository.save(project);
+    }
+
+    private Build mapRun(WorkflowRunsService.WorkflowRun run, Project project) {
+        return new Build(
+                UUID.randomUUID(),
+                String.valueOf(run.id()),
+                project.getId(),
+                run.actor().login(),
+                Integer.parseInt(run.runNumber()),
+                run.commitHash(),
+                run.displayTitle(),
+                run.headBranch(),
+                Utils.mapGithubStatus(run.conclusion(), run.status()),
+                Instant.parse(run.createdAt()),
+                Instant.parse(run.updatedAt())
+        );
+    }
+
+    @Override
+    public Build getBuild(String owner, String repo, String buildId) {
+        var project = projectRepository.findByGithubName(repo);
+        return mapRun(gitHubClient.getBuild(owner, repo, Long.parseLong(buildId)), project);
+    }
+}

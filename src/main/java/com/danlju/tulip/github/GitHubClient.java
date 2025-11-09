@@ -1,7 +1,7 @@
 package com.danlju.tulip.github;
 
 import com.danlju.tulip.builds.BuildClient;
-import com.danlju.tulip.service.WorkflowRunsService;
+import com.danlju.tulip.application.service.WorkflowRunsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,8 +71,6 @@ public class GitHubClient implements BuildClient {
 
     @Override
     public WorkflowRunsService.WorkflowRun getBuild(String owner, String repo, Long buildId) {
-        // /repos/{owner}/{repo}/actions/runs/{run_id}
-        // /repos/danlju/tulip-api/runs/19185947627
         String url = BASE_URL + "/" + owner + "/" + repo + "/actions/runs/" + buildId;
 
         HttpHeaders headers = new HttpHeaders();

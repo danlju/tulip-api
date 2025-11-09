@@ -1,9 +1,9 @@
 package com.danlju.tulip.scheduling;
 
 import com.danlju.tulip.config.TulipConfig;
-import com.danlju.tulip.domain.Project;
-import com.danlju.tulip.repo.ProjectRepository;
-import com.danlju.tulip.service.BuildService;
+import com.danlju.tulip.core.domain.Project;
+import com.danlju.tulip.application.repository.ProjectRepository;
+import com.danlju.tulip.application.service.BuildService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
 package com.danlju.tulip.builds;
 
-import com.danlju.tulip.service.WorkflowRunsService;
+import com.danlju.tulip.application.service.WorkflowRunsService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
