@@ -42,4 +42,4 @@ jobs:
         role-to-assume: arn:aws:iam::565493866114:role/GitHubDeployRole
         aws-region: us-east-1
     - name: Upload artifact to S3
-      run: aws s3 cp build/libs/tulip-api-{{$env.RELEASE_VERSION}}.jar s3://tulip-api-artifacts/
+      run: aws s3 cp "build/libs/tulip-api-{{ $env.RELEASE_VERSION }}.jar" s3://tulip-api-artifacts/
