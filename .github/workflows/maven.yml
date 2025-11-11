@@ -34,6 +34,8 @@ jobs:
     - name: Set Release version env variable
       run: |
           echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+    - name: Set artifact name
+      run: echo ::set-env name=ARTIFACT_NAME::tulip-api-${{ env.RELEASE_VERSION}}.jar
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Configure AWS credentials
@@ -42,4 +44,4 @@ jobs:
         role-to-assume: arn:aws:iam::565493866114:role/GitHubDeployRole
         aws-region: us-east-1
     - name: Upload artifact to S3
-      run: aws s3 cp "build/libs/tulip-api-{{ $env.RELEASE_VERSION }}.jar" s3://tulip-api-artifacts/
+      run: aws s3 cp ${{ env.ARTIFACT_NAME }} s3://tulip-api-artifacts/
