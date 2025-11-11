@@ -35,7 +35,7 @@ jobs:
       run: |
           echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
     - name: Set artifact name
-      run: echo ::set-env name=ARTIFACT_NAME::tulip-api-${{ env.RELEASE_VERSION}}.jar
+      run: echo "ARTIFACT_NAME=tulip-api-${RELEASE_VERSION}.jar" >> $GITHUB_ENV
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Configure AWS credentials
