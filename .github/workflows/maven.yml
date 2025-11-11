@@ -18,9 +18,7 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 21
@@ -31,3 +29,10 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::565493866114:role/GitHubDeployRole  # TODO: update with actual role
+        aws-region: us-east-1
+    - name: Upload artifact to S3
+      run: aws s3 cp build/libs/tulip-api.jar s3://tulip-api-artifacts/

@@ -6,12 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class GitHubClient implements BuildClient {
@@ -81,5 +83,11 @@ public class GitHubClient implements BuildClient {
         ResponseEntity<WorkflowRunsService.WorkflowRun> response = restTemplate.exchange(url, HttpMethod.GET, entity, WorkflowRunsService.WorkflowRun.class);
 
         return response.getBody();
+    }
+
+//    @Async
+    public CompletableFuture<String> startDeployment(String account, String repo, String workflowId) {
+
+        return null;
     }
 }
