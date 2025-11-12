@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: tulip-api template
+
+Parameters:
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+  InstanceType:
+    Type: String
+    Default: t3.micro
+  JarS3Bucket:
+    Type: String
+  JarS3Key:
+    Type: String
+  GithubTokenSecretSecretArn:
+    Type: String
+    Description: ARN of the Secrets Manager secret that contains the GitHub token
+
+Resources:
+  AppRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AppPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref GithubTokenSecretArn
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles: [ !Ref EC2SecretsRole ]
+      Path: "/"
+
+  AppInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      ImageId: ami-0c55b159cbfafe1f0   # change to region-correct AMI
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          # Install updated packages and aws cli/jq if needed (Amazon Linux 2 example)
+          yum update -y
+          yum install -y aws-cli jq java-17-amazon-corretto
+
+          # Download the JAR from S3
+          aws s3 cp s3://${JarS3Bucket}/${JarS3Key} /home/ec2-user/app.jar
+          chown ec2-user:ec2-user /home/ec2-user/app.jar
+
+          # Fetch the GitHub token from Secrets Manager
+          # Expect the secret's SecretString to be either plain token or JSON like {"token":"..."}
+          SECRET_JSON=$(aws secretsmanager get-secret-value --secret-id "${SecretsManagerSecretArn}" --query SecretString --output text)
+          # If the secret is plain token (not JSON), SECRET_JSON will be the token string.
+          # If it's JSON, try to parse "token" field; fallback to full string.
+          GITHUB_TOKEN=$(echo "$SECRET_JSON" | jq -r 'if (type == "object") then (.token // .) else . end' 2>/dev/null || echo "$SECRET_JSON")
+
+          # Create a systemd unit that runs the JAR with the environment variable
+          cat > /etc/systemd/system/springapp.service <<'EOF'
+          [Unit]
+          Description=Spring Boot App
+          After=network.target
+
+          [Service]
+          User=ec2-user
+          Environment=GITHUB_TOKEN=${GITHUB_TOKEN}
+          WorkingDirectory=/home/ec2-user
+          ExecStart=/usr/bin/java -jar /home/ec2-user/app.jar --spring.profiles.active=dev
+          Restart=on-failure
+          SuccessExitStatus=143
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+          # make sure systemd unit ownership is correct
+          chown root:root /etc/systemd/system/springapp.service
+          chmod 0644 /etc/systemd/system/springapp.service
+
+          # Start the service
+          systemctl daemon-reload
+          systemctl enable springapp
+          systemctl start springapp
+
+Outputs:
+  InstanceId:
+    Value: !Ref AppInstance
+    Description: The EC2 instance ID
