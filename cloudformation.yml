@@ -39,6 +39,7 @@ Resources:
                   - secretsmanager:GetSecretValue
                 Resource: !Ref GithubTokenSecretArn
               - Effect: Allow
+            Statement:
                 Action:
                   - s3:GetObject
                 Resource: arn:aws:s3:::tulip-api-artifacts/*
