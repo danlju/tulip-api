@@ -14,6 +14,9 @@ Parameters:
   GithubTokenSecretArn:
     Type: String
     Description: ARN of the Secrets Manager secret that contains the GitHub token
+  TulipApiSG:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: EC2 SG id for Tulip API
 
 Resources:
   AppRole:
@@ -35,21 +38,10 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                 Resource: !Ref GithubTokenSecretArn
-            Statement:
               - Effect: Allow
                 Action:
                   - s3:GetObject
                 Resource: arn:aws:s3:::tulip-api-artifacts/*
-  InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow SSH from anywhere (use only for testing)
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
@@ -64,7 +56,7 @@ Resources:
       ImageId: ami-0e68e34976bb4db93
       IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroupIds:
-        - !Ref InstanceSecurityGroup
+        - !Ref TulipApiSG
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
