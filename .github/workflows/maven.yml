@@ -36,6 +36,8 @@ jobs:
           echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
     - name: Set artifact name
       run: echo "ARTIFACT_NAME=target/tulip-api-${RELEASE_VERSION}.jar" >> $GITHUB_ENV
+    - name: Set template name
+      run: echo "TEMPLATE_NAME=tulip-api-${RELEASE_VERSION}-cf.yml" >> $GITHUB_ENV
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - name: Configure AWS credentials
@@ -45,3 +47,5 @@ jobs:
         aws-region: us-east-1
     - name: Upload artifact to S3
       run: aws s3 cp ${{ env.ARTIFACT_NAME }} s3://tulip-api-artifacts/
+    - name: Upload cf template to S3
+      run: aws s3 cp cloudformation.yml s3://tulip-api-artifacts/${{env.TEMPLATE_NAME}}

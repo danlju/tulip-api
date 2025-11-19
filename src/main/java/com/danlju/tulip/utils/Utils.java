@@ -5,6 +5,7 @@ import java.util.Objects;
 
 public class Utils {
 
+    // TODO: use enum
     public static String mapGithubStatus(String conclusion, String status) {
         if (conclusion == null || conclusion.isBlank()) {
             if (Objects.equals(status, "failed")) {
