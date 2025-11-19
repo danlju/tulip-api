@@ -48,4 +48,4 @@ jobs:
     - name: Upload artifact to S3
       run: aws s3 cp ${{ env.ARTIFACT_NAME }} s3://tulip-api-artifacts/
     - name: Upload cf template to S3
-      run: aws s3 cp cloudformation.yml s3://tulip-api-artifacts/${{env.TEMPLATE_NAME}}
+      run: aws s3 cp cloudformation.yml s3://tulip-cf-templates/${{env.TEMPLATE_NAME}}
