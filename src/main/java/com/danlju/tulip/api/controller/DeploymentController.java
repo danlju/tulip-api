@@ -1,36 +1,42 @@
 package com.danlju.tulip.api.controller;
 
+import com.danlju.tulip.api.controller.model.StartDeploymentRequestModel;
+import com.danlju.tulip.application.usecases.DeploymentUseCases;
 import com.danlju.tulip.config.TulipConfig;
-import com.danlju.tulip.github.GitHubClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class DeploymentController {
 
-    @Autowired
-    private GitHubClient gitHubClient;
+    private static final Logger logger = LoggerFactory.getLogger(DeploymentController.class);
 
     @Autowired
     private TulipConfig tulipConfig;
 
-    @GetMapping
-//    @Async
-    public ResponseEntity<String> startDeployment(String repo, String workflowId) {
+    @Autowired
+    private DeploymentUseCases deployUseCases;
 
-        CompletableFuture<String> startDeployment = gitHubClient.startDeployment(
-                tulipConfig.getGithubProperties().getAccount(), repo, workflowId
-                );
+    @PostMapping("/deploy")
+    public ResponseEntity<StartDeploymentResponseModel> startDeployment(@RequestBody StartDeploymentRequestModel requestModel) {
+        // repo, version, environment (dev, prod etc)
+        logger.info("Received deployment request: {}", requestModel);
 
+        var result = deployUseCases.startDeploy(requestModel.externalId(), requestModel.region(), requestModel.environment());
 
-        //String result1 = future1.get(); // Blocks until future1 is complete
-        //future2.get(); // Blocks until future2 is complete
-
-        return ResponseEntity.ok("OK");
+        if (!result.isSuccess()) {
+            logger.error("Start Deploy not successful: {}", result.getErrorMessage());
+            return ResponseEntity.badRequest().body(
+                    StartDeploymentResponseModel.error(result.getErrorMessage())
+            ); // TODO: fix
+        }
+        var response = new StartDeploymentResponseModel(result.getData().stackId());
+        return ResponseEntity.ok(response);// TODO: fix
     }
 
 }

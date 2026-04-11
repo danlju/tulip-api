@@ -1,7 +1,5 @@
-package com.danlju.tulip.service;
+package com.danlju.tulip.application.service;
 
-import com.danlju.tulip.application.service.BuildService;
-import com.danlju.tulip.application.service.WorkflowRunsService;
 import com.danlju.tulip.core.domain.Build;
 import com.danlju.tulip.core.domain.Project;
 import com.danlju.tulip.github.GitHubClient;

@@ -10,4 +10,5 @@ public interface BuildUseCases {
     void syncBuilds(String owner, String repo);
     Build saveBuild(BuildModel buildModel);
     Build getBuild(String owner, String repo, String buildId);
+    void requestBuild(String owner, String repo);
 }

@@ -10,7 +10,7 @@ import java.util.List;
 public class ModelMapper {
 
     public static BuildResponseModel toBuildResponseModel(Build build) {
-        return new BuildResponseModel(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(), build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", Utils.calculateDuration(build.getStartedAt(), build.getUpdatedAt()));
+        return new BuildResponseModel(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(), build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", Utils.calculateDuration(build.getStartedAt(), build.getUpdatedAt()), build.getExternalId());
     }
 
     public static ProjectModel toModel(Project project) {
@@ -21,7 +21,7 @@ public class ModelMapper {
         List<BuildResponseModel> builds = new ArrayList<>();
         for (Build build : workflowRuns) {
             builds.add(
-                    new BuildResponseModel(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(),build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", Utils.calculateDuration(build.getStartedAt(), build.getUpdatedAt()))
+                toBuildResponseModel(build)
             );
         }
         return builds;

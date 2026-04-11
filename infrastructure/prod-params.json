@@ -1,0 +1,4 @@
+{
+  "SecretValue": "staging-secret",
+  "InstanceType": "t3.small"
+}

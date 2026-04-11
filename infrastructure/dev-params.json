@@ -1,0 +1,23 @@
+[
+  {
+    "parameterKey": "KeyPairName",
+    "parameterValue": "tulip-api-keypair"
+  },
+  {
+    "parameterKey": "JarS3Bucket",
+    "parameterValue": "tulip-api-artifacts"
+  },
+  {
+    "parameterKey": "JarS3Key",
+    "parameterValue": "tulip-api-0.1.jar"
+
+  },
+  {
+    "parameterKey": "GithubTokenSecretArn",
+    "parameterValue": "ap-northeast-1:565493866114:secret:TulipApi/GithubToken-DR5Efl"
+  },
+  {
+    "parameterKey": "TulipApiSG",
+    "parameterValue": "sg-0ed245f995e8b4cc4"
+  }
+]

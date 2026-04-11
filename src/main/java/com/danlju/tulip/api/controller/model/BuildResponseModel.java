@@ -9,5 +9,6 @@ public record BuildResponseModel(
         String branch,
         String runNumber,
         String displayTitle,
-        String duration
+        String duration,
+        String externalId
 ) {}

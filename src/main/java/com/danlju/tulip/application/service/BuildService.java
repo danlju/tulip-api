@@ -102,4 +102,9 @@ public class BuildService implements BuildUseCases {
         var project = projectRepository.findByGithubName(repo);
         return mapRun(gitHubClient.getBuild(owner, repo, Long.parseLong(buildId)), project);
     }
+
+    @Override
+    public void requestBuild(String owner, String repo) {
+
+    }
 }
