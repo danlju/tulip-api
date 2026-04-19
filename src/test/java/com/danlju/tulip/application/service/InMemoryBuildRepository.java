@@ -23,12 +23,12 @@ public class InMemoryBuildRepository implements BuildRepository {
     }
 
     @Override
-    public Build findByExternalId(String externalId) {
-        return null;
+    public List<Build> findByProjectId(Integer id) {
+        return List.of();
     }
 
     @Override
-    public List<Build> findByProjectId(Integer id) {
+    public List<Build> findByProjectPublicId(UUID publicId) {
         return List.of();
     }
 }

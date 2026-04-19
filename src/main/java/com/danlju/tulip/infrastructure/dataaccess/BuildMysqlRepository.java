@@ -1,13 +1,15 @@
 package com.danlju.tulip.infrastructure.dataaccess;
 
 import com.danlju.tulip.core.domain.Build;
-import com.danlju.tulip.infrastructure.dataaccess.entity.BuildDbEntity;
 import com.danlju.tulip.application.repository.BuildRepository;
+import com.danlju.tulip.infrastructure.dataaccess.entity.BuildDbEntity;
+import com.danlju.tulip.infrastructure.dataaccess.entity.BuildMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -23,32 +25,37 @@ public class BuildMysqlRepository implements BuildRepository {
 
     @Override
     public Build save(Build build) {
-        var entityToSave = BuildDbEntity.toEntity(build);
+        var entityToSave = BuildMapper.toEntity(build);
         var entity = buildCrudRepository.save(entityToSave);
-        return BuildDbEntity.toBuild(entity);
+        return BuildMapper.toDomain(entity);
     }
 
     @Override
     public Build findById(Integer id) {
-        var entity = buildCrudRepository.findById(id);
-        return BuildDbEntity.toBuild(entity.orElse(null));
+        Optional<BuildDbEntity> entity = buildCrudRepository.findById(id);
+
+       // assert entity.orElse(null) != null;
+        var build=  BuildMapper.toDomain(entity.get());
+        return build; // TODO: fix
     }
 
     @Override
     public Build findByPublicId(UUID id) {
         var entity = buildCrudRepository.findByPublicId(id);
-        return BuildDbEntity.toBuild(entity);
-    }
-
-    @Override
-    public Build findByExternalId(String externalId) {
-        var entity = buildCrudRepository.findByExternalId(externalId);
-        return BuildDbEntity.toBuild(entity);
+        return BuildMapper.toDomain(entity);
     }
 
     @Override
     public List<Build> findByProjectId(Integer id) {
-        var builds = buildCrudRepository.findByProjectId(id);
-        return builds.stream().map(BuildDbEntity::toBuild).toList();
+//        var builds = buildCrudRepository.findByProjectId(id);
+//        return builds.stream().map(BuildMapper::toDomain).toList();
+        return List.of();
+    }
+
+    @Override
+    public List<Build> findByProjectPublicId(UUID publicId) {
+        var builds = buildCrudRepository.findByProjectPublicId(publicId);
+
+       return builds.stream().map(BuildMapper::toDomain).toList();
     }
 }

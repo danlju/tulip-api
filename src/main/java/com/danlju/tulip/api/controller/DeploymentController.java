@@ -2,7 +2,6 @@ package com.danlju.tulip.api.controller;
 
 import com.danlju.tulip.api.controller.model.StartDeploymentRequestModel;
 import com.danlju.tulip.application.usecases.DeploymentUseCases;
-import com.danlju.tulip.config.TulipConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeploymentController {
 
     private static final Logger logger = LoggerFactory.getLogger(DeploymentController.class);
-
-    @Autowired
-    private TulipConfig tulipConfig;
 
     @Autowired
     private DeploymentUseCases deployUseCases;

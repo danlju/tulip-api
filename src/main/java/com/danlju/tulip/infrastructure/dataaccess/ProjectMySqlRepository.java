@@ -53,4 +53,11 @@ public class ProjectMySqlRepository implements ProjectRepository {
         projectCrudRepository.findAll().iterator().forEachRemaining(projects::add);
         return projects.stream().map(ProjectDbEntity::toProject).toList();
     }
+
+    @Override
+    public Project findByPublicIdForUpdate(UUID publicId) {
+        return ProjectDbEntity.toProject(
+                projectCrudRepository.findByPublicIdForUpdate(publicId)
+        );
+    }
 }

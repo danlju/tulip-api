@@ -66,9 +66,7 @@ public class DeploymentService implements DeploymentUseCases {
             return new Result<>(false, null, "Failed creating stack");
         }
 
-        var build = buildRepository.findByExternalId(externalId);
-        var deployment = deploymentRepository.save(new Deployment(UUID.randomUUID(), build.getId(), result.getStackId(), Instant.now(), "pending"));
-
+        // TODO: rewrite this method
         return new Result<>(new StartDeploymentResult(result.getStackId()));
     }
 

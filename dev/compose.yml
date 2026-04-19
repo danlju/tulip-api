@@ -9,3 +9,13 @@ services:
       - 'MYSQL_USER=tulipdb'
     ports:
       - '3306:3306'
+
+  elasticmq:
+    container_name: 'tulip-dev-queue'
+    image: softwaremill/elasticmq-native:latest
+    ports:
+      - '9324:9324'
+    volumes:
+      - ./elasticmq.conf:/opt/elasticmq.conf
+    command: >
+      -Dconfig.file=/opt/elasticmq.conf

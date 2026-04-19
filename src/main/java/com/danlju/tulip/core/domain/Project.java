@@ -8,27 +8,30 @@ public class Project {
     private Integer id;
     private UUID publicId;
     private String name;
-    private String githubName;
+    private String cloneUrl;
     private Integer totalRuns;
+    private Integer nextBuildNumber;
     private Instant mostRecentBuild;
     private String mostRecentBuildStatus;
     private Instant lastSyncedAt;
+    private String configPath; // TODO: maybe move to separate config object
 
-    public Project(Integer id, UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public Project(Integer id, UUID publicId, String name, String cloneUrl, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.id = id;
         this.publicId = publicId;
         this.name = name;
-        this.githubName = githubName;
+        this.cloneUrl = cloneUrl;
         this.totalRuns = totalRuns;
+        this.nextBuildNumber = nextBuildNumber;
         this.mostRecentBuild = mostRecentBuild;
         this.mostRecentBuildStatus = mostRecentBuildStatus;
         this.lastSyncedAt = lastSyncedAt;
     }
 
-    public Project(UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public Project(UUID publicId, String name, String cloneUrl, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.publicId = publicId;
         this.name = name;
-        this.githubName = githubName;
+        this.cloneUrl = cloneUrl;
         this.totalRuns = totalRuns;
         this.mostRecentBuild = mostRecentBuild;
         this.mostRecentBuildStatus = mostRecentBuildStatus;
@@ -59,12 +62,12 @@ public class Project {
         this.name = name;
     }
 
-    public String getGithubName() {
-        return githubName;
+    public String getCloneUrl() {
+        return cloneUrl;
     }
 
-    public void setGithubName(String githubName) {
-        this.githubName = githubName;
+    public void setCloneUrl(String cloneUrl) {
+        this.cloneUrl = cloneUrl;
     }
 
     public Integer getTotalRuns() {
@@ -73,6 +76,14 @@ public class Project {
 
     public void setTotalRuns(Integer totalRuns) {
         this.totalRuns = totalRuns;
+    }
+
+    public Integer getNextBuildNumber() {
+        return nextBuildNumber;
+    }
+
+    public void setNextBuildNumber(Integer nextBuildNumber) {
+        this.nextBuildNumber = nextBuildNumber;
     }
 
     public Instant getMostRecentBuild() {
@@ -97,5 +108,13 @@ public class Project {
 
     public void setLastSyncedAt(Instant lastSyncedAt) {
         this.lastSyncedAt = lastSyncedAt;
+    }
+
+    public String getConfigPath() {
+        return configPath;
+    }
+
+    public void setConfigPath(String configPath) {
+        this.configPath = configPath;
     }
 }

@@ -4,47 +4,47 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class Build {
-
     private Integer id;
     private UUID publicId;
-    private String externalId;
-    private Integer projectId;
-    private String startedByUser;
     private Integer number;
-    private String commit;
-    private String commitMessage;
+    private Integer projectId;
+    private BuildStatus status;
+    private String cloneUrl;
     private String branch;
-    private String status;
+    private String commitSha;
+    private String commitMessage;
     private Instant startedAt;
     private Instant updatedAt;
 
-    public Build(Integer id, UUID publicId, String externalId, Integer projectId, String startedByUser, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public Build(UUID publicId, int buildNumber, int projectId, BuildStatus status, String branch, String commitSha) {
+        this.publicId = publicId;
+        this.number = buildNumber;
+        this.projectId = projectId;
+        this.status = status;
+        this.branch = branch;
+        this.commitSha = commitSha;
+    }
+
+    public Build(Integer id, UUID publicId, Integer number, Integer projectId, BuildStatus status, String cloneUrl, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
         this.id = id;
         this.publicId = publicId;
-        this.externalId = externalId;
-        this.projectId = projectId;
-        this.startedByUser = startedByUser;
         this.number = number;
-        this.commit = commit;
-        this.commitMessage = commitMessage;
-        this.branch = branch;
+        this.projectId = projectId;
         this.status = status;
+        this.cloneUrl = cloneUrl;
+        this.branch = branch;
+        this.commitSha = commitSha;
+        this.commitMessage = commitMessage;
         this.startedAt = startedAt;
         this.updatedAt = updatedAt;
     }
 
-    public Build(UUID publicId, String externalId, Integer projectId, String startedByUser, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public Build(int id, UUID publicId, int number, int projectId, BuildStatus status) {
+        this.id = id;
         this.publicId = publicId;
-        this.externalId = externalId;
-        this.projectId = projectId;
-        this.startedByUser = startedByUser;
         this.number = number;
-        this.commit = commit;
-        this.commitMessage = commitMessage;
-        this.branch = branch;
+        this.projectId = projectId;
         this.status = status;
-        this.startedAt = startedAt;
-        this.updatedAt = updatedAt;
     }
 
     public Integer getId() {
@@ -55,36 +55,8 @@ public class Build {
         this.id = id;
     }
 
-    public Integer getProjectId() {
-        return projectId;
-    }
-
-    public void setProjectId(Integer projectId) {
-        this.projectId = projectId;
-    }
-
-    public String getStartedByUser() {
-        return startedByUser;
-    }
-
-    public void setStartedByUser(String startedByUser) {
-        this.startedByUser = startedByUser;
-    }
-
     public UUID getPublicId() {
         return publicId;
-    }
-
-    public void setPublicId(UUID publicId) {
-        this.publicId = publicId;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
     }
 
     public Integer getNumber() {
@@ -95,20 +67,28 @@ public class Build {
         this.number = number;
     }
 
-    public String getCommit() {
-        return commit;
+    public void setPublicId(UUID publicId) {
+        this.publicId = publicId;
     }
 
-    public String getCommitMessage() {
-        return commitMessage;
+    public Integer getProjectId() {
+        return projectId;
     }
 
-    public void setCommitMessage(String commitMessage) {
-        this.commitMessage = commitMessage;
+    public void setProjectId(Integer projectId) {
+        this.projectId = projectId;
     }
 
-    public void setCommit(String commit) {
-        this.commit = commit;
+    public BuildStatus getStatus() {
+        return status;
+    }
+
+    public String getCloneUrl() {
+        return cloneUrl;
+    }
+
+    public void setCloneUrl(String cloneUrl) {
+        this.cloneUrl = cloneUrl;
     }
 
     public String getBranch() {
@@ -119,12 +99,20 @@ public class Build {
         this.branch = branch;
     }
 
-    public String getStatus() {
-        return status;
+    public String getCommitSha() {
+        return commitSha;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setCommitSha(String commitSha) {
+        this.commitSha = commitSha;
+    }
+
+    public String getCommitMessage() {
+        return commitMessage;
+    }
+
+    public void setCommitMessage(String commitMessage) {
+        this.commitMessage = commitMessage;
     }
 
     public Instant getStartedAt() {
@@ -143,19 +131,25 @@ public class Build {
         this.updatedAt = updatedAt;
     }
 
-    @Override
-    public String toString() {
-        return "Build{" +
-                "id=" + id +
-                ", publicId=" + publicId +
-                ", externalId='" + externalId + '\'' +
-                ", projectId=" + projectId +
-                ", number=" + number +
-                ", commit='" + commit + '\'' +
-                ", branch='" + branch + '\'' +
-                ", status='" + status + '\'' +
-                ", startedAt=" + startedAt +
-                ", updatedAt=" + updatedAt +
-                '}';
+    public static Build create(UUID publicId, int buildNumber, int projectId, String branch, String commitSha) {
+        return new Build(
+                publicId,
+                buildNumber,
+                projectId,
+                BuildStatus.REQUESTED,
+                branch,
+                commitSha
+        );
+    }
+
+    public static Build load(int id, UUID publicId, int number, int projectId, BuildStatus status) {
+        return new Build(id, publicId, number, projectId, status);
+    }
+
+    public void transitionTo(BuildStatus newStatus) throws IllegalBuildStateTransitionException {
+        if (!status.canTransitionTo(newStatus)) {
+            throw new IllegalBuildStateTransitionException(status, newStatus);
+        }
+        this.status = newStatus;
     }
 }

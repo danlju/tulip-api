@@ -19,6 +19,7 @@ public class ProjectDbEntity {
     @Column(unique = true)
     private String githubName;
     private Integer totalRuns;
+    private Integer nextBuildNumber;
     private Instant mostRecentBuild;
     private String mostRecentBuildStatus;
     private Instant lastSyncedAt;
@@ -26,16 +27,13 @@ public class ProjectDbEntity {
     public ProjectDbEntity() {
     }
 
-    public ProjectDbEntity(Integer id) {
-        this.id = id;
-    }
-
-    public ProjectDbEntity(Integer id, UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public ProjectDbEntity(Integer id, UUID publicId, String name, String githubName, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.id = id;
         this.publicId = publicId;
         this.name = name;
         this.githubName = githubName;
         this.totalRuns = totalRuns;
+        this.nextBuildNumber = nextBuildNumber;
         this.mostRecentBuild = mostRecentBuild;
         this.mostRecentBuildStatus = mostRecentBuildStatus;
         this.lastSyncedAt = lastSyncedAt;
@@ -91,6 +89,14 @@ public class ProjectDbEntity {
         this.totalRuns = totalRuns;
     }
 
+    public Integer getNextBuildNumber() {
+        return nextBuildNumber;
+    }
+
+    public void setNextBuildNumber(Integer nextBuildNumber) {
+        this.nextBuildNumber = nextBuildNumber;
+    }
+
     public Instant getMostRecentBuild() {
         return mostRecentBuild;
     }
@@ -123,8 +129,9 @@ public class ProjectDbEntity {
                 project.getId(),
                 project.getPublicId(),
                 project.getName(),
-                project.getGithubName(),
+                project.getCloneUrl(),
                 project.getTotalRuns(),
+                project.getNextBuildNumber(),
                 project.getMostRecentBuild(),
                 project.getMostRecentBuildStatus(),
                 project.getLastSyncedAt());
@@ -138,8 +145,15 @@ public class ProjectDbEntity {
                 dbEntity.name,
                 dbEntity.githubName,
                 dbEntity.totalRuns,
+                dbEntity.nextBuildNumber,
                 dbEntity.mostRecentBuild,
                 dbEntity.mostRecentBuildStatus,
                 dbEntity.lastSyncedAt);
+    }
+
+    public static ProjectDbEntity load(int id) {
+        var entity = new ProjectDbEntity();
+        entity.id = id;
+        return entity;
     }
 }

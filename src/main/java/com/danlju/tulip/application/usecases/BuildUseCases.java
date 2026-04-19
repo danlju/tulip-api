@@ -1,14 +1,14 @@
 package com.danlju.tulip.application.usecases;
 
 import com.danlju.tulip.core.domain.Build;
-import com.danlju.tulip.application.service.BuildModel;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface BuildUseCases {
-    List<Build> getBuildsForProject(String owner, String repo);
+    List<Build> getBuildsForProjectByPublicId(UUID publicId);
     void syncBuilds(String owner, String repo);
-    Build saveBuild(BuildModel buildModel);
     Build getBuild(String owner, String repo, String buildId);
-    void requestBuild(String owner, String repo);
+    RequestBuildResult requestBuild(String owner, String repo, String branch, String commit, String user);
+    void updateStatusForBuild(String buildId, String status);
 }

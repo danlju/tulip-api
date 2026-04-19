@@ -9,6 +9,6 @@ public interface BuildRepository {
     Build save(Build build);
     Build findById(Integer id);
     Build findByPublicId(UUID id);
-    Build findByExternalId(String externalId);
     List<Build> findByProjectId(Integer id);
+    List<Build> findByProjectPublicId(UUID publicId);
 }

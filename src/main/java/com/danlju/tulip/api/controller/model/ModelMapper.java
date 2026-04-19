@@ -10,11 +10,20 @@ import java.util.List;
 public class ModelMapper {
 
     public static BuildResponseModel toBuildResponseModel(Build build) {
-        return new BuildResponseModel(Long.parseLong(build.getExternalId()), "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", build.getStatus(), build.getStartedByUser(), build.getCommit(), build.getBranch(), build.getNumber().toString(), "TODO: displayTitle", Utils.calculateDuration(build.getStartedAt(), build.getUpdatedAt()), build.getExternalId());
+        return new BuildResponseModel(
+                0L, "#" + build.getNumber().toString() + " [" + build.getCommitMessage() + "]", // TODO: fix
+                build.getStatus().toString(),
+                "STARTED_BY_USER REMOVE",
+                build.getCommitSha(),
+                build.getBranch(),
+                build.getNumber().toString(),
+                "TODO: displayTitle",
+                Utils.calculateDuration(build.getStartedAt(), build.getUpdatedAt()),
+                "");
     }
 
     public static ProjectModel toModel(Project project) {
-        return new ProjectModel(project.getId().toString(), project.getPublicId().toString(), project.getName(), project.getGithubName());
+        return new ProjectModel(project.getId().toString(), project.getPublicId().toString(), project.getName(), project.getCloneUrl());
     }
 
     public static List<BuildResponseModel> toBuildsResponseModel(List<Build> workflowRuns) {

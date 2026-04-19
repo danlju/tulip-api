@@ -1,7 +1,8 @@
 package com.danlju.tulip.infrastructure.dataaccess.entity;
 
 
-import com.danlju.tulip.core.domain.Build;
+import com.danlju.tulip.core.domain.BuildStatus;
+import com.danlju.tulip.core.domain.SourceProvider;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -15,49 +16,45 @@ public class BuildDbEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private UUID publicId;
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @Column(unique = true)
+    private Integer number;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) // TODO: lazy
     @JoinColumn(name = "project_id", nullable = false)
     private ProjectDbEntity project;
-    private String startedByUser;
-    @Column(unique = true)
-    private String externalId;
-    private Integer number;
-    private String commit;
+    @Enumerated(EnumType.STRING)
+    private BuildStatus status;
+    @Enumerated(EnumType.STRING)
+    private SourceProvider sourceProvider;
+    private String commitSha;
     private String commitMessage;
     private String branch;
-    private String status;
     private Instant startedAt;
     private Instant updatedAt;
 
     public BuildDbEntity() {
     }
 
-    public BuildDbEntity(Integer id, UUID publicId, ProjectDbEntity project, String startedByUser, String externalId, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public BuildDbEntity(Integer id, UUID publicId, Integer number, ProjectDbEntity project, BuildStatus status, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
         this.id = id;
         this.publicId = publicId;
-        this.project = project;
-        this.startedByUser = startedByUser;
-        this.externalId = externalId;
         this.number = number;
-        this.commit = commit;
+        this.project = project;
+        this.status = status;
+        this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.branch = branch;
-        this.status = status;
         this.startedAt = startedAt;
         this.updatedAt = updatedAt;
     }
 
-    public BuildDbEntity(UUID publicId, ProjectDbEntity project, String startedByUser, String externalId, Integer number, String commit, String commitMessage, String branch, String status, Instant startedAt, Instant updatedAt) {
+    public BuildDbEntity(UUID publicId, ProjectDbEntity project, Integer number, BuildStatus status, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
         this.publicId = publicId;
         this.project = project;
-        this.startedByUser = startedByUser;
-        this.externalId = externalId;
-        this.externalId = externalId;
         this.number = number;
-        this.commit = commit;
+        this.status = status;
+        this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.branch = branch;
-        this.status = status;
         this.startedAt = startedAt;
         this.updatedAt = updatedAt;
     }
@@ -78,36 +75,12 @@ public class BuildDbEntity {
         this.project = project;
     }
 
-    public String getStartedByUser() {
-        return startedByUser;
-    }
-
-    public void setStartedByUser(String startedByUser) {
-        this.startedByUser = startedByUser;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public UUID getPublicId() {
         return publicId;
     }
 
     public void setPublicId(UUID publicId) {
         this.publicId = publicId;
-    }
-
-    public String getExternalId() {
-        return externalId;
-    }
-
-    public void setExternalId(String externalId) {
-        this.externalId = externalId;
     }
 
     public Integer getNumber() {
@@ -118,14 +91,29 @@ public class BuildDbEntity {
         this.number = number;
     }
 
-    public String getCommit() {
-        return commit;
+    public BuildStatus getStatus() {
+        return status;
     }
 
-    public void setCommit(String commit) {
-        this.commit = commit;
+    public void setStatus(BuildStatus status) {
+        this.status = status;
     }
 
+    public String getCommitSha() {
+        return commitSha;
+    }
+
+    public void setCommitSha(String commitSha) {
+        this.commitSha = commitSha;
+    }
+
+    public String getCommitMessage() {
+        return commitMessage;
+    }
+
+    public void setCommitMessage(String commitMessage) {
+        this.commitMessage = commitMessage;
+    }
     public String getBranch() {
         return branch;
     }
@@ -150,56 +138,14 @@ public class BuildDbEntity {
         this.updatedAt = updatedAt;
     }
 
-    public static Build toBuild(BuildDbEntity dbEntity) {
-        if (dbEntity == null) {
-            return null;
-        }
-        return new Build(
-                dbEntity.id,
-                dbEntity.publicId,
-                dbEntity.externalId,
-                dbEntity.project.getId(),
-                dbEntity.startedByUser,
-                dbEntity.number,
-                dbEntity.commit,
-                dbEntity.commitMessage,
-                dbEntity.branch,
-                dbEntity.status,
-                dbEntity.startedAt,
-                dbEntity.updatedAt
-        );
-    }
-    public static BuildDbEntity toEntity(Build build) {
-
-        if (build == null) {
-            return null;
-        }
-
-        return new BuildDbEntity(
-                build.getId(),
-                build.getPublicId(),
-                new ProjectDbEntity(build.getProjectId()),
-                build.getStartedByUser(),
-                build.getExternalId(),
-                build.getNumber(),
-                build.getCommit(),
-                build.getCommitMessage(),
-                build.getBranch(),
-                build.getStatus(),
-                build.getStartedAt(),
-                build.getUpdatedAt()
-        );
-    }
-
     @Override
     public String toString() {
         return "BuildDbEntity{" +
                 "id=" + id +
                 ", publicId=" + publicId +
                 ", project=" + project +
-                ", externalId='" + externalId + '\'' +
                 ", number=" + number +
-                ", commit='" + commit + '\'' +
+                ", commit='" + commitSha + '\'' +
                 ", branch='" + branch + '\'' +
                 ", startedAt=" + startedAt +
                 ", updatedAt=" + updatedAt +

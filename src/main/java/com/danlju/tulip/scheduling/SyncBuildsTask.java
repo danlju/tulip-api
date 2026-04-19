@@ -1,7 +1,5 @@
 package com.danlju.tulip.scheduling;
 
-import com.danlju.tulip.config.TulipConfig;
-import com.danlju.tulip.core.domain.Project;
 import com.danlju.tulip.application.repository.ProjectRepository;
 import com.danlju.tulip.application.service.BuildService;
 import org.slf4j.Logger;
@@ -24,17 +22,14 @@ public class SyncBuildsTask {
     @Autowired
     private ProjectRepository projectRepository;
 
-    @Autowired
-    private TulipConfig tulipConfig;
-
     @Scheduled(fixedRate = SYNC_RATE_MS)
     public void syncBuilds() {
-        logger.info("Github account from config: {}", tulipConfig.getGithubProperties().getAccount());
-        var projects = projectRepository.findAll();
 
-        for (Project project : projects) {
-            logger.info("Syncing for {} ({})", project.getName(), project.getGithubName());
-            buildService.syncBuilds("danlju", project.getGithubName());
-        }
+//        var projects = projectRepository.findAll();
+
+  //      for (Project project : projects) {
+//            logger.info("Syncing for {} ({})", project.getName(), project.getGithubName());
+//            buildService.syncBuilds("danlju", project.getGithubName());
+  //      }
     }
 }

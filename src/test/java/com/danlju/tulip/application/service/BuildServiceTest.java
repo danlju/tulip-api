@@ -1,7 +1,9 @@
 package com.danlju.tulip.application.service;
 
 import com.danlju.tulip.core.domain.Build;
+import com.danlju.tulip.core.domain.BuildStatus;
 import com.danlju.tulip.core.domain.Project;
+import com.danlju.tulip.core.domain.SourceProvider;
 import com.danlju.tulip.github.GitHubClient;
 import com.danlju.tulip.application.repository.BuildRepository;
 import com.danlju.tulip.application.repository.ProjectRepository;
@@ -38,10 +40,7 @@ class BuildServiceTest {
 
     @Test
     public void should_sync_builds() {
-        when(gitHubClient.getAllBuilds(eq("danlju"), eq("test-repo"), any(Instant.class))).thenReturn(
-            mockResponse()
-        );
-        when(projectRepository.findByGithubName("test-repo")).thenReturn(
+        when(projectRepository.("test-repo")).thenReturn(
                 new Project(
                         1001,
                         UUID.randomUUID(),
@@ -55,19 +54,11 @@ class BuildServiceTest {
         );
 
         // Existing and up to date
-        when(buildRepository.findByExternalId(eq("2001"))).thenReturn(
-            new Build(10, UUID.randomUUID(), "2001", 1001, "theUser", 1, "commit", "commitMessage", "branch", "success", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:07:00Z"))
-        );
-        // Existing but more recent updated date -> should be synced with database
-        when(buildRepository.findByExternalId(eq("2002"))).thenReturn(
-            new Build(11, UUID.randomUUID(), "2002", 1001, "theUser", 1, "commit", "commitMessage", "branch", "in progress", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:09:00Z"))
-        );
-        // Non-existing -> should be saved in database
-        when(buildRepository.findByExternalId(eq("2003"))).thenReturn(
-            null
+        when(buildRepository.findById(10)).thenReturn(
+            new Build(10, UUID.randomUUID(), 1, 1001, BuildStatus.REQUESTED, SourceProvider.GENERIC, "commit", "commitMessage", "branch", "success", Instant.parse("2025-11-07T05:08:00Z"), Instant.parse("2025-11-07T05:07:00Z"))
         );
 
-        buildService.syncBuilds("danlju", "test-repo");
+        buildService.updateStatusForBuild();
 
         verify(buildRepository, times(2)).save(any());
     }

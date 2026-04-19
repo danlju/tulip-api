@@ -1,5 +1,6 @@
-package com.danlju.tulip.application.repository;
+package com.danlju.tulip.application.service;
 
+import com.danlju.tulip.application.repository.DeploymentRepository;
 import com.danlju.tulip.core.domain.Deployment;
 
 public class InMemoryDeploymentRepository implements DeploymentRepository {
