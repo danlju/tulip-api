@@ -94,6 +94,8 @@ public class BuildService implements BuildUseCases {
 
         var project = projectRepository.findByPublicIdForUpdate(UUID.fromString(repo));
 
+        logger.info("Fetch Project with UUID={}", repo);
+
         var build = Build.create(
                 UUID.randomUUID(),
                 project.getNextBuildNumber(),

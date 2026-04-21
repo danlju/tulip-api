@@ -12,7 +12,7 @@ public class Project {
     private Integer totalRuns;
     private Integer nextBuildNumber;
     private Instant mostRecentBuild;
-    private String mostRecentBuildStatus;
+    private String mostRecentBuildStatus; // TODO: enum
     private Instant lastSyncedAt;
     private String configPath; // TODO: maybe move to separate config object
 
@@ -28,11 +28,12 @@ public class Project {
         this.lastSyncedAt = lastSyncedAt;
     }
 
-    public Project(UUID publicId, String name, String cloneUrl, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public Project(UUID publicId, String name, String cloneUrl, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.publicId = publicId;
         this.name = name;
         this.cloneUrl = cloneUrl;
         this.totalRuns = totalRuns;
+        this.nextBuildNumber = nextBuildNumber;
         this.mostRecentBuild = mostRecentBuild;
         this.mostRecentBuildStatus = mostRecentBuildStatus;
         this.lastSyncedAt = lastSyncedAt;

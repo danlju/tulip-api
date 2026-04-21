@@ -14,6 +14,7 @@ public class BuildDbEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(unique = true)
     private UUID publicId;
     @Column(unique = true)
     private Integer number;

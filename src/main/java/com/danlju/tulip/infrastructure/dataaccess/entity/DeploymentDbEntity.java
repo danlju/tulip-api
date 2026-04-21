@@ -13,6 +13,7 @@ public class DeploymentDbEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+    @Column(unique = true)
     private UUID publicId;
     private Integer buildId;
     private String stackId;

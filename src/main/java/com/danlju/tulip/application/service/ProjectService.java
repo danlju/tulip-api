@@ -19,7 +19,7 @@ public class ProjectService implements ProjectUseCases {
 
     @Override
     public Project createProject(UUID publicId, String name, String cloneUrl, String sourceProvider) {
-        return projectRepository.save(new Project(UUID.randomUUID(), name, cloneUrl, 10, Instant.ofEpochMilli(0), "unknown", Instant.ofEpochMilli(0))); // TODO: Instant
+        return projectRepository.save(new Project(UUID.randomUUID(), name, cloneUrl, 0, 1, Instant.ofEpochMilli(0), "unknown", Instant.ofEpochMilli(0)));
     }
 
     @Override
