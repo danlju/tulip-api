@@ -11,5 +11,5 @@ public interface BuildUseCases {
     void syncBuilds(String repo);
     Build getBuild(String repo, String buildId);
     RequestBuildResult requestBuild(String repo, String branch, String commit, String user);
-    void updateStatusForBuild(String buildId, String status);
+    void updateStatusForBuild(Integer buildId, String status);
 }

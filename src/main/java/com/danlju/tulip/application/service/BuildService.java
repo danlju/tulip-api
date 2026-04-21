@@ -145,9 +145,9 @@ public class BuildService implements BuildUseCases {
 
     @Override
     @Transactional
-    public void updateStatusForBuild(String buildId, String status) {
+    public void updateStatusForBuild(Integer buildId, String status) {
 
-        var build = buildRepository.findById(Integer.parseInt(buildId));
+        var build = buildRepository.findById(buildId);
         build.transitionTo(BuildStatus.valueOf(status.toUpperCase()));
 
         buildRepository.save(build);

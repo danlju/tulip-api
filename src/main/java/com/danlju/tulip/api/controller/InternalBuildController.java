@@ -22,7 +22,7 @@ public class InternalBuildController {
     @PostMapping(value = "/internal/builds/{buildId}/{status}", consumes = "application/json")
     public ResponseEntity<?> updateBuildStatus(@PathVariable String buildId, @PathVariable String status) {
         logger.info("Update build {} with status {}", buildId, status );
-        buildService.updateStatusForBuild(buildId, status);
+        buildService.updateStatusForBuild(Integer.parseInt(buildId), status);
 
         return ResponseEntity.ok()
                 .body(Map.of(
