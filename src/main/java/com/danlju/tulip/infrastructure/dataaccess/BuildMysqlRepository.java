@@ -6,6 +6,7 @@ import com.danlju.tulip.infrastructure.dataaccess.entity.BuildDbEntity;
 import com.danlju.tulip.infrastructure.dataaccess.entity.BuildMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,8 +18,9 @@ public class BuildMysqlRepository implements BuildRepository {
 
     private static final Logger logger = LoggerFactory.getLogger(BuildMysqlRepository.class);
 
-    private BuildCrudRepository buildCrudRepository;
+    private final BuildCrudRepository buildCrudRepository;
 
+    @Autowired
     public BuildMysqlRepository(BuildCrudRepository buildCrudRepository) {
         this.buildCrudRepository = buildCrudRepository;
     }
@@ -33,10 +35,7 @@ public class BuildMysqlRepository implements BuildRepository {
     @Override
     public Build findById(Integer id) {
         Optional<BuildDbEntity> entity = buildCrudRepository.findById(id);
-
-       // assert entity.orElse(null) != null;
-        var build=  BuildMapper.toDomain(entity.get());
-        return build; // TODO: fix
+        return BuildMapper.toDomain(entity.get()); // TODO: fix
     }
 
     @Override
@@ -55,7 +54,6 @@ public class BuildMysqlRepository implements BuildRepository {
     @Override
     public List<Build> findByProjectPublicId(UUID publicId) {
         var builds = buildCrudRepository.findByProjectPublicId(publicId);
-
-       return builds.stream().map(BuildMapper::toDomain).toList();
+        return builds.stream().map(BuildMapper::toDomain).toList();
     }
 }

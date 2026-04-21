@@ -1,4 +1,4 @@
-package com.danlju.tulip.api.controller;
+package com.danlju.tulip.api.controller.model;
 
 public record StartDeploymentResponseModel(String stackId, String errorMessage) {
     public StartDeploymentResponseModel(String stackId) {

@@ -1,14 +1,10 @@
 package com.danlju.tulip.api.controller.model;
 
 public record BuildResponseModel(
-        long id,
-        String name,
+        String id,
         String status,
-        String startedByUser,
         String commit,
         String branch,
         String runNumber,
-        String displayTitle,
-        String duration,
-        String externalId
+        String duration
 ) {}

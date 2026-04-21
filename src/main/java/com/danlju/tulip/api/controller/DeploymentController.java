@@ -1,6 +1,7 @@
 package com.danlju.tulip.api.controller;
 
 import com.danlju.tulip.api.controller.model.StartDeploymentRequestModel;
+import com.danlju.tulip.api.controller.model.StartDeploymentResponseModel;
 import com.danlju.tulip.application.usecases.DeploymentUseCases;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,19 +21,7 @@ public class DeploymentController {
 
     @PostMapping("/deploy")
     public ResponseEntity<StartDeploymentResponseModel> startDeployment(@RequestBody StartDeploymentRequestModel requestModel) {
-        // repo, version, environment (dev, prod etc)
-        logger.info("Received deployment request: {}", requestModel);
-
-        var result = deployUseCases.startDeploy(requestModel.externalId(), requestModel.region(), requestModel.environment());
-
-        if (!result.isSuccess()) {
-            logger.error("Start Deploy not successful: {}", result.getErrorMessage());
-            return ResponseEntity.badRequest().body(
-                    StartDeploymentResponseModel.error(result.getErrorMessage())
-            ); // TODO: fix
-        }
-        var response = new StartDeploymentResponseModel(result.getData().stackId());
-        return ResponseEntity.ok(response);// TODO: fix
+        return ResponseEntity.ok(new StartDeploymentResponseModel("foo")); // TODO
     }
 
 }

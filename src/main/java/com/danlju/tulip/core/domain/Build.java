@@ -1,9 +1,12 @@
 package com.danlju.tulip.core.domain;
 
+import com.danlju.tulip.core.domain.exceptions.IllegalBuildStateTransitionException;
+
 import java.time.Instant;
 import java.util.UUID;
 
 public class Build {
+
     private Integer id;
     private UUID publicId;
     private Integer number;
@@ -23,6 +26,8 @@ public class Build {
         this.status = status;
         this.branch = branch;
         this.commitSha = commitSha;
+        this.startedAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public Build(Integer id, UUID publicId, Integer number, Integer projectId, BuildStatus status, String cloneUrl, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
@@ -142,8 +147,8 @@ public class Build {
         );
     }
 
-    public static Build load(int id, UUID publicId, int number, int projectId, BuildStatus status) {
-        return new Build(id, publicId, number, projectId, status);
+    public static Build load(int id, UUID publicId, int number, int projectId, BuildStatus status, String cloneUrl, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
+        return new Build(id, publicId, number, projectId, status, cloneUrl, branch, commitSha, commitMessage, startedAt, updatedAt);
     }
 
     public void transitionTo(BuildStatus newStatus) throws IllegalBuildStateTransitionException {

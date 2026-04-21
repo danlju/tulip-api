@@ -1,4 +1,4 @@
-package com.danlju.tulip.application.service.model;
+package com.danlju.tulip.application.usecases.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -142,4 +142,5 @@ public record BuildRequest(int version, Build build,
                 Instant.now()
         );
     }
+
 }

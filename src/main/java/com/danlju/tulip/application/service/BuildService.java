@@ -1,7 +1,7 @@
 package com.danlju.tulip.application.service;
 
-import com.danlju.tulip.application.service.model.BuildRequest;
-import com.danlju.tulip.application.usecases.RequestBuildResult;
+import com.danlju.tulip.application.usecases.model.BuildRequest;
+import com.danlju.tulip.application.usecases.model.RequestBuildResult;
 import com.danlju.tulip.core.domain.BuildStatus;
 import com.danlju.tulip.application.usecases.BuildUseCases;
 import com.danlju.tulip.core.domain.Build;
@@ -52,7 +52,7 @@ public class BuildService implements BuildUseCases {
     }
 
     @Override
-    public void syncBuilds(String owner, String repo) {
+    public void syncBuilds(String repo) {
 //        // TODO: move out from method and use as a parameter?
 //        var project = projectRepository.findByGithubName(repo);
 //
@@ -82,7 +82,7 @@ public class BuildService implements BuildUseCases {
     }
 
     @Override
-    public Build getBuild(String owner, String repo, String buildId) {
+    public Build getBuild(String repo, String buildId) {
         var project = projectRepository.findByGithubName(repo);
         return null;
         //return mapRun(gitHubClient.getBuild(owner, repo, Long.parseLong(buildId)), project);
@@ -90,7 +90,7 @@ public class BuildService implements BuildUseCases {
 
     @Override
     @Transactional
-    public RequestBuildResult requestBuild(String owner, String repo, String branch, String commit, String user) {
+    public RequestBuildResult requestBuild(String repo, String branch, String commit, String user) {
 
         var project = projectRepository.findByPublicIdForUpdate(UUID.fromString(repo));
 
@@ -140,7 +140,7 @@ public class BuildService implements BuildUseCases {
                 .messageBody(payload)
                 .build());
 
-        return new RequestBuildResult(build.getId());
+        return new RequestBuildResult(build.getPublicId());
     }
 
     @Override

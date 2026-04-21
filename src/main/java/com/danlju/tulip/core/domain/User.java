@@ -2,6 +2,7 @@ package com.danlju.tulip.core.domain;
 
 import java.util.UUID;
 
+/** not really used at the moment */
 public class User {
 
     private Integer id;

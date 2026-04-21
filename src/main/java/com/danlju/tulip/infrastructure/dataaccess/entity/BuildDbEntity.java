@@ -2,7 +2,6 @@ package com.danlju.tulip.infrastructure.dataaccess.entity;
 
 
 import com.danlju.tulip.core.domain.BuildStatus;
-import com.danlju.tulip.core.domain.SourceProvider;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -23,8 +22,7 @@ public class BuildDbEntity {
     private ProjectDbEntity project;
     @Enumerated(EnumType.STRING)
     private BuildStatus status;
-    @Enumerated(EnumType.STRING)
-    private SourceProvider sourceProvider;
+    private String cloneUrl;
     private String commitSha;
     private String commitMessage;
     private String branch;
@@ -34,12 +32,13 @@ public class BuildDbEntity {
     public BuildDbEntity() {
     }
 
-    public BuildDbEntity(Integer id, UUID publicId, Integer number, ProjectDbEntity project, BuildStatus status, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
+    public BuildDbEntity(Integer id, UUID publicId, Integer number, ProjectDbEntity project, BuildStatus status, String cloneUrl, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
         this.id = id;
         this.publicId = publicId;
         this.number = number;
         this.project = project;
         this.status = status;
+        this.cloneUrl = cloneUrl;
         this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.branch = branch;
@@ -47,11 +46,12 @@ public class BuildDbEntity {
         this.updatedAt = updatedAt;
     }
 
-    public BuildDbEntity(UUID publicId, ProjectDbEntity project, Integer number, BuildStatus status, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
+    public BuildDbEntity(UUID publicId, ProjectDbEntity project, Integer number, BuildStatus status, String cloneUrl, String branch, String commitSha, String commitMessage, Instant startedAt, Instant updatedAt) {
         this.publicId = publicId;
         this.project = project;
         this.number = number;
         this.status = status;
+        this.cloneUrl = cloneUrl;
         this.commitSha = commitSha;
         this.commitMessage = commitMessage;
         this.branch = branch;
@@ -97,6 +97,14 @@ public class BuildDbEntity {
 
     public void setStatus(BuildStatus status) {
         this.status = status;
+    }
+
+    public String getCloneUrl() {
+        return cloneUrl;
+    }
+
+    public void setCloneUrl(String cloneUrl) {
+        this.cloneUrl = cloneUrl;
     }
 
     public String getCommitSha() {
@@ -145,7 +153,7 @@ public class BuildDbEntity {
                 ", publicId=" + publicId +
                 ", project=" + project +
                 ", number=" + number +
-                ", commit='" + commitSha + '\'' +
+                ", commitSha='" + commitSha + '\'' +
                 ", branch='" + branch + '\'' +
                 ", startedAt=" + startedAt +
                 ", updatedAt=" + updatedAt +

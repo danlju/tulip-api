@@ -19,7 +19,7 @@ public enum BuildStatus {
     );
 
     public boolean canTransitionTo(BuildStatus target) {
-        if (this == target) return true; // idempotency
+        if (this == target) return true;
 
         return transitions
                 .getOrDefault(this, Set.of())

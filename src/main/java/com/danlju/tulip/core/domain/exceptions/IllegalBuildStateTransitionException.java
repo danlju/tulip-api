@@ -1,4 +1,6 @@
-package com.danlju.tulip.core.domain;
+package com.danlju.tulip.core.domain.exceptions;
+
+import com.danlju.tulip.core.domain.BuildStatus;
 
 // TODO: enrich with build id etc...
 public class IllegalBuildStateTransitionException extends RuntimeException {

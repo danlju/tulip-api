@@ -1,4 +1,5 @@
-package com.danlju.tulip.application.usecases;
+package com.danlju.tulip.application.usecases.model;
 
 public record StartDeploymentResult(String stackId) {
 }
+

@@ -13,12 +13,11 @@ This project is **actively under development**.
 Current focus:
 
 * Build lifecycle and state management
-* Worker execution model
 * Basic UI for build visibility
-
-Planned improvements:
-
 * Real build execution (Docker-based)
+
+  Planned improvements:
+
 * Pipeline configuration (YAML)
 * Authentication & multi-user support
 * More robust failure handling and retries
@@ -37,13 +36,16 @@ tulip-api (Spring Boot)
     SQS
      ↓
 tulip-worker (Go)
+     ↓ (update build status)
+tulip-api
 ```
+
 
 ### Components
 
 #### 🔹 tulip-api
 
-* Spring Boot application
+* Spring Boot application (architecture inspired by hexagonal architecture)
 * Exposes REST API
 * Persists builds and projects (MySQL)
 * Publishes build jobs to SQS
@@ -103,7 +105,11 @@ State transitions are validated to prevent illegal transitions.
 
 ## 🚀 Running Locally (WIP)
 
-Instructions will be added as the project stabilizes.
+Instructions will be added as the project stabilizes. For now, you can start a dev environment with the following command:
+```console
+cd dev && docker-compose up -d
+```
+
 
 ---
 
