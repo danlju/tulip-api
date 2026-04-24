@@ -5,7 +5,6 @@ import com.danlju.tulip.application.usecases.model.RequestBuildResult;
 import com.danlju.tulip.core.domain.BuildStatus;
 import com.danlju.tulip.application.usecases.BuildUseCases;
 import com.danlju.tulip.core.domain.Build;
-import com.danlju.tulip.github.GitHubClient;
 import com.danlju.tulip.application.repository.BuildRepository;
 import com.danlju.tulip.application.repository.ProjectRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,17 +30,13 @@ public class BuildService implements BuildUseCases {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private GitHubClient gitHubClient;
-
-    @Autowired
     private BuildRepository buildRepository;
 
     @Autowired
     private SqsClient sqsClient;
 
-    public BuildService(ProjectRepository projectRepository, GitHubClient gitHubClient, BuildRepository buildRepository) {
+    public BuildService(ProjectRepository projectRepository, BuildRepository buildRepository) {
         this.projectRepository = projectRepository;
-        this.gitHubClient = gitHubClient;
         this.buildRepository = buildRepository;
     }
 
