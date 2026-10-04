@@ -32,7 +32,7 @@ class BuildServiceTest {
             new Build(UUID.randomUUID(), 1, 1001, BuildStatus.REQUESTED, "commit", "commitMessage")
         );
 
-        buildService.updateStatusForBuild(1, "running");
+        buildService.updateStatusForBuild(1, BuildStatus.RUNNING);
 
         verify(buildRepository, times(1)).save(any());
     }
@@ -44,7 +44,7 @@ class BuildServiceTest {
         );
 
         assertThrows(IllegalBuildStateTransitionException.class, () -> {
-            buildService.updateStatusForBuild(1, "completed");
+            buildService.updateStatusForBuild(1, BuildStatus.COMPLETED);
         });
     }
 }

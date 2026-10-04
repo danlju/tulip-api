@@ -35,13 +35,13 @@ public class BuildMysqlRepository implements BuildRepository {
     @Override
     public Build findById(Integer id) {
         Optional<BuildDbEntity> entity = buildCrudRepository.findById(id);
-        return BuildMapper.toDomain(entity.get()); // TODO: fix
+        return entity.map(BuildMapper::toDomain).orElse(null);
     }
 
     @Override
     public Build findByPublicId(UUID id) {
         var entity = buildCrudRepository.findByPublicId(id);
-        return BuildMapper.toDomain(entity);
+        return entity == null ? null : BuildMapper.toDomain(entity);
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.danlju.tulip.application.usecases.model.RequestBuildResult;
 import com.danlju.tulip.core.domain.BuildStatus;
 import com.danlju.tulip.application.usecases.BuildUseCases;
 import com.danlju.tulip.core.domain.Build;
+import com.danlju.tulip.core.domain.exceptions.BuildNotFoundException;
 import com.danlju.tulip.application.repository.BuildRepository;
 import com.danlju.tulip.application.repository.ProjectRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -77,26 +78,24 @@ public class BuildService implements BuildUseCases {
     }
 
     @Override
-    public Build getBuild(String repo, String buildId) {
-        var project = projectRepository.findByGithubName(repo);
-        return null;
-        //return mapRun(gitHubClient.getBuild(owner, repo, Long.parseLong(buildId)), project);
+    public Build getBuildByPublicId(UUID publicId) {
+        return buildRepository.findByPublicId(publicId);
     }
 
     @Override
     @Transactional
-    public RequestBuildResult requestBuild(String repo, String branch, String commit, String user) {
+    public RequestBuildResult requestBuild(String projectId, String branch, String commitSha) {
 
-        var project = projectRepository.findByPublicIdForUpdate(UUID.fromString(repo));
+        var project = projectRepository.findByPublicIdForUpdate(UUID.fromString(projectId));
 
-        logger.info("Fetch Project with UUID={}", repo);
+        logger.info("Fetch Project with UUID={}", projectId);
 
         var build = Build.create(
                 UUID.randomUUID(),
                 project.getNextBuildNumber(),
                 project.getId(),
                 branch,
-                commit
+                commitSha
         );
 
         build.setProjectId(project.getId());
@@ -142,10 +141,13 @@ public class BuildService implements BuildUseCases {
 
     @Override
     @Transactional
-    public void updateStatusForBuild(Integer buildId, String status) {
+    public void updateStatusForBuild(Integer buildId, BuildStatus status) {
 
         var build = buildRepository.findById(buildId);
-        build.transitionTo(BuildStatus.valueOf(status.toUpperCase()));
+        if (build == null) {
+            throw new BuildNotFoundException(buildId);
+        }
+        build.transitionTo(status);
 
         buildRepository.save(build);
     }

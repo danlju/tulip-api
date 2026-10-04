@@ -1,6 +1,7 @@
 package com.danlju.tulip.api.controller;
 
 import com.danlju.tulip.application.service.BuildService;
+import com.danlju.tulip.core.domain.BuildStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,20 +15,22 @@ import java.util.Map;
 @RestController
 public class InternalBuildController {
 
-    private Logger logger = LoggerFactory.getLogger(InternalBuildController.class);
+    private static final Logger logger = LoggerFactory.getLogger(InternalBuildController.class);
 
     @Autowired
     private BuildService buildService;
 
-    @PostMapping(value = "/internal/builds/{buildId}/{status}", consumes = "application/json")
-    public ResponseEntity<?> updateBuildStatus(@PathVariable String buildId, @PathVariable String status) {
+    @PostMapping("/internal/builds/{buildId}/{status}")
+    public ResponseEntity<?> updateBuildStatus(
+            @PathVariable Integer buildId,
+            @PathVariable BuildStatus status) {
         logger.info("Update build {} with status {}", buildId, status );
-        buildService.updateStatusForBuild(Integer.parseInt(buildId), status);
+        buildService.updateStatusForBuild(buildId, status);
 
         return ResponseEntity.ok()
                 .body(Map.of(
                         "buildId", buildId,
-                        "status", status
+                        "status", status.name()
                 ));
     }
 }
