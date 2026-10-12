@@ -5,12 +5,14 @@ import com.danlju.tulip.core.domain.Build;
 public class BuildMapper {
 
     public static Build toDomain(BuildDbEntity buildDbEntity) {
-        return Build.load(buildDbEntity.getId(), buildDbEntity.getPublicId(), buildDbEntity.getNumber(), buildDbEntity.getProject().getId(), buildDbEntity.getStatus(), buildDbEntity.getCloneUrl(),
+        Build build = Build.load(buildDbEntity.getId(), buildDbEntity.getPublicId(), buildDbEntity.getNumber(), buildDbEntity.getProject().getId(), buildDbEntity.getStatus(), buildDbEntity.getCloneUrl(),
                 buildDbEntity.getBranch(), buildDbEntity.getCommitSha(), buildDbEntity.getCommitMessage(), buildDbEntity.getStartedAt(), buildDbEntity.getUpdatedAt());
+        build.setFailureReason(buildDbEntity.getFailureReason());
+        return build;
     }
 
     public static BuildDbEntity toEntity(Build build) {
-        return new BuildDbEntity(
+        BuildDbEntity entity = new BuildDbEntity(
                 build.getId(),
                 build.getPublicId(),
                 build.getNumber(),
@@ -23,5 +25,7 @@ public class BuildMapper {
                 build.getStartedAt(),
                 build.getUpdatedAt()
         );
+        entity.setFailureReason(build.getFailureReason());
+        return entity;
     }
 }

@@ -6,5 +6,6 @@ public record BuildResponseModel(
         String commit,
         String branch,
         String runNumber,
-        String duration
+        String duration,
+        String error
 ) {}

@@ -23,14 +23,17 @@ public class InternalBuildController {
     @PostMapping("/internal/builds/{buildId}/{status}")
     public ResponseEntity<?> updateBuildStatus(
             @PathVariable Integer buildId,
-            @PathVariable BuildStatus status) {
+            @PathVariable BuildStatus status,
+            @org.springframework.web.bind.annotation.RequestBody(required = false) Map<String, Object> details) {
         logger.info("Update build {} with status {}", buildId, status );
-        buildService.updateStatusForBuild(buildId, status);
+        String failureReason = details == null || details.get("error") == null
+                ? null : details.get("error").toString();
+        BuildStatus actualStatus = buildService.updateStatusForBuild(buildId, status, failureReason);
 
         return ResponseEntity.ok()
                 .body(Map.of(
                         "buildId", buildId,
-                        "status", status.name()
+                        "status", actualStatus.name()
                 ));
     }
 }

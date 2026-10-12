@@ -10,12 +10,11 @@ public class Utils {
         if (seconds < 60) {
             return seconds + "s";
         }
-        long h = seconds / 60;
-        long m = seconds / 60 % 60;
-
-        String duration = "";
-        duration += h + "h";
-
-        return duration + " " + m +"m";
+        long hours = seconds / 3600;
+        long minutes = seconds / 60 % 60;
+        if (hours == 0) {
+            return minutes + "m";
+        }
+        return hours + "h " + minutes + "m";
     }
 }

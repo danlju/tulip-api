@@ -6,6 +6,7 @@ import com.danlju.tulip.core.domain.BuildStatus;
 import com.danlju.tulip.application.usecases.BuildUseCases;
 import com.danlju.tulip.core.domain.Build;
 import com.danlju.tulip.core.domain.exceptions.BuildNotFoundException;
+import com.danlju.tulip.core.domain.exceptions.ProjectNotFoundException;
 import com.danlju.tulip.application.repository.BuildRepository;
 import com.danlju.tulip.application.repository.ProjectRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,6 +17,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
@@ -35,6 +37,9 @@ public class BuildService implements BuildUseCases {
 
     @Autowired
     private SqsClient sqsClient;
+
+    @Value("${sqs.queue-url}")
+    private String sqsQueueUrl;
 
     public BuildService(ProjectRepository projectRepository, BuildRepository buildRepository) {
         this.projectRepository = projectRepository;
@@ -88,6 +93,10 @@ public class BuildService implements BuildUseCases {
 
         var project = projectRepository.findByPublicIdForUpdate(UUID.fromString(projectId));
 
+        if (project == null) {
+            throw new ProjectNotFoundException(projectId);
+        }
+
         logger.info("Fetch Project with UUID={}", projectId);
 
         var build = Build.create(
@@ -116,7 +125,7 @@ public class BuildService implements BuildUseCases {
             var buildRequest = BuildRequest.of(
                     Integer.toString(savedBuild.getId()),
                     project.getId().toString(), // TODO
-                    build.getCloneUrl(),
+                    project.getCloneUrl(),
                     "GENERIC", // TODO: ?
                     build.getBranch(),
                     build.getCommitSha(),
@@ -132,7 +141,7 @@ public class BuildService implements BuildUseCases {
 
         logger.info("Payload: {}", payload);
         sqsClient.sendMessage(SendMessageRequest.builder()
-                .queueUrl("http://localhost:9324/tulip-queue")
+                .queueUrl(sqsQueueUrl)
                 .messageBody(payload)
                 .build());
 
@@ -142,13 +151,28 @@ public class BuildService implements BuildUseCases {
     @Override
     @Transactional
     public void updateStatusForBuild(Integer buildId, BuildStatus status) {
+        updateStatusForBuild(buildId, status, null);
+    }
+
+    @Transactional
+    public BuildStatus updateStatusForBuild(Integer buildId, BuildStatus status, String failureReason) {
 
         var build = buildRepository.findById(buildId);
         if (build == null) {
             throw new BuildNotFoundException(buildId);
         }
+        if (status == BuildStatus.RUNNING
+                && (build.getStatus() == BuildStatus.COMPLETED || build.getStatus() == BuildStatus.FAILED)) {
+            return build.getStatus();
+        }
         build.transitionTo(status);
+        if (status == BuildStatus.FAILED) {
+            build.setFailureReason(failureReason == null
+                    ? null
+                    : failureReason.substring(0, Math.min(failureReason.length(), 4000)));
+        }
 
         buildRepository.save(build);
+        return build.getStatus();
     }
 }

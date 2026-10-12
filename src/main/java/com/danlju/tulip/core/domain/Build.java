@@ -18,6 +18,7 @@ public class Build {
     private String commitMessage;
     private Instant startedAt;
     private Instant updatedAt;
+    private String failureReason;
 
     public Build(UUID publicId, int buildNumber, int projectId, BuildStatus status, String branch, String commitSha) {
         this.publicId = publicId;
@@ -132,6 +133,10 @@ public class Build {
         return updatedAt;
     }
 
+    public String getFailureReason() { return failureReason; }
+
+    public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
+
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
@@ -152,9 +157,17 @@ public class Build {
     }
 
     public void transitionTo(BuildStatus newStatus) throws IllegalBuildStateTransitionException {
+        if (status == newStatus) {
+            return;
+        }
         if (!status.canTransitionTo(newStatus)) {
             throw new IllegalBuildStateTransitionException(status, newStatus);
         }
         this.status = newStatus;
+        if (newStatus == BuildStatus.RUNNING) {
+            this.startedAt = Instant.now();
+            this.failureReason = null;
+        }
+        this.updatedAt = Instant.now();
     }
 }

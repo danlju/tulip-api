@@ -29,6 +29,8 @@ public class BuildDbEntity {
     private String branch;
     private Instant startedAt;
     private Instant updatedAt;
+    @Column(length = 4000)
+    private String failureReason;
 
     public BuildDbEntity() {
     }
@@ -142,6 +144,10 @@ public class BuildDbEntity {
     public Instant getUpdatedAt() {
         return updatedAt;
     }
+
+    public String getFailureReason() { return failureReason; }
+
+    public void setFailureReason(String failureReason) { this.failureReason = failureReason; }
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;

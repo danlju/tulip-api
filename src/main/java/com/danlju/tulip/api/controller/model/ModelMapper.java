@@ -13,7 +13,8 @@ public class ModelMapper {
                 build.getCommitSha(),
                 build.getBranch(),
                 build.getNumber().toString(),
-                Utils.calculateDuration(build.getStartedAt(), build.getUpdatedAt()));
+                Utils.calculateDuration(build.getStartedAt(), build.getUpdatedAt()),
+                build.getFailureReason());
     }
 
     public static ProjectResponseModel toModel(Project project) {

@@ -2,6 +2,7 @@ package com.danlju.tulip.api.controller;
 
 import com.danlju.tulip.core.domain.exceptions.IllegalBuildStateTransitionException;
 import com.danlju.tulip.core.domain.exceptions.BuildNotFoundException;
+import com.danlju.tulip.core.domain.exceptions.ProjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -19,6 +20,16 @@ public class ApiExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(Map.of(
                         "error", "BUILD_NOT_FOUND",
+                        "message", ex.getMessage()
+                ));
+    }
+
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<?> handleProjectNotFound(ProjectNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of(
+                        "error", "PROJECT_NOT_FOUND",
                         "message", ex.getMessage()
                 ));
     }
