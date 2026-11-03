@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/shell :: head('Projects · Tulip')}"></head>
+<body>
+<div th:replace="~{fragments/shell :: navigation(${activePage})}"></div>
+<main class="page-shell">
+    <div th:if="${notice}" class="notice" role="status" th:text="${notice}">Project connected.</div>
+    <section class="page-heading">
+        <div>
+            <p class="eyebrow">WORKSPACE / PROJECTS</p>
+            <h1>Your projects<span class="heading-period">.</span></h1>
+            <p class="lede">A clear view of every repository moving through Tulip.</p>
+        </div>
+        <a class="button-link" href="#connect-project">Connect a project <span aria-hidden="true">＋</span></a>
+    </section>
+
+    <section class="section-block" aria-labelledby="projects-heading">
+        <div class="section-heading">
+            <div>
+                <h2 id="projects-heading">Repositories</h2>
+                <p>Choose a project to inspect its build history.</p>
+            </div>
+            <span class="count-chip" th:text="${#lists.size(projects)} + ' total'">0 total</span>
+        </div>
+        <div id="project-list" th:replace="~{fragments/project-list :: project-list}"></div>
+    </section>
+
+    <section id="connect-project" class="connect-panel">
+        <div class="connect-copy">
+            <p class="eyebrow">GET STARTED</p>
+            <h2>Bring a repository in.</h2>
+            <p>Point Tulip at a clone URL. Builds run in an isolated worker.</p>
+        </div>
+        <form class="connect-form" method="post" th:action="@{/projects}">
+            <label for="project-name">Project name</label>
+            <input id="project-name" name="name" placeholder="e.g. storefront" required maxlength="120">
+            <label for="clone-url">Git clone URL</label>
+            <input id="clone-url" name="cloneUrl" type="url" placeholder="https://github.com/org/repo.git" required>
+            <label for="provider">Source provider</label>
+            <select id="provider" name="sourceProvider">
+                <option value="GITHUB">GitHub</option>
+                <option value="GITLAB">GitLab</option>
+                <option value="GENERIC">Generic Git</option>
+            </select>
+            <button type="submit">Connect repository <span aria-hidden="true">→</span></button>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
+</body>
+</html>

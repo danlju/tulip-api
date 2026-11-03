@@ -1,6 +1,7 @@
 package com.danlju.tulip.infrastructure.dataaccess.entity;
 
 import com.danlju.tulip.core.domain.Project;
+import com.danlju.tulip.core.domain.SourceProvider;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -17,8 +18,11 @@ public class ProjectDbEntity {
     private UUID publicId;
     @Column(unique = true)
     private String name;
-    @Column(unique = true)
-    private String githubName;
+    // Keep the existing column name so existing projects retain their clone URL during rollout.
+    @Column(name = "github_name", unique = true)
+    private String cloneUrl;
+    @Enumerated(EnumType.STRING)
+    private SourceProvider sourceProvider;
     private Integer totalRuns;
     private Integer nextBuildNumber;
     private Instant mostRecentBuild;
@@ -28,11 +32,12 @@ public class ProjectDbEntity {
     public ProjectDbEntity() {
     }
 
-    public ProjectDbEntity(Integer id, UUID publicId, String name, String githubName, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public ProjectDbEntity(Integer id, UUID publicId, String name, String cloneUrl, SourceProvider sourceProvider, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.id = id;
         this.publicId = publicId;
         this.name = name;
-        this.githubName = githubName;
+        this.cloneUrl = cloneUrl;
+        this.sourceProvider = sourceProvider;
         this.totalRuns = totalRuns;
         this.nextBuildNumber = nextBuildNumber;
         this.mostRecentBuild = mostRecentBuild;
@@ -40,10 +45,11 @@ public class ProjectDbEntity {
         this.lastSyncedAt = lastSyncedAt;
     }
 
-    public ProjectDbEntity(UUID publicId, String name, String githubName, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+    public ProjectDbEntity(UUID publicId, String name, String cloneUrl, SourceProvider sourceProvider, Integer totalRuns, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.publicId = publicId;
         this.name = name;
-        this.githubName = githubName;
+        this.cloneUrl = cloneUrl;
+        this.sourceProvider = sourceProvider;
         this.totalRuns = totalRuns;
         this.mostRecentBuild = mostRecentBuild;
         this.mostRecentBuildStatus = mostRecentBuildStatus;
@@ -74,12 +80,20 @@ public class ProjectDbEntity {
         this.name = name;
     }
 
-    public String getGithubName() {
-        return githubName;
+    public String getCloneUrl() {
+        return cloneUrl;
     }
 
-    public void setGithubName(String githubName) {
-        this.githubName = githubName;
+    public void setCloneUrl(String cloneUrl) {
+        this.cloneUrl = cloneUrl;
+    }
+
+    public SourceProvider getSourceProvider() {
+        return sourceProvider;
+    }
+
+    public void setSourceProvider(SourceProvider sourceProvider) {
+        this.sourceProvider = sourceProvider;
     }
 
     public Integer getTotalRuns() {
@@ -131,6 +145,7 @@ public class ProjectDbEntity {
                 project.getPublicId(),
                 project.getName(),
                 project.getCloneUrl(),
+                project.getSourceProvider(),
                 project.getTotalRuns(),
                 project.getNextBuildNumber(),
                 project.getMostRecentBuild(),
@@ -144,7 +159,8 @@ public class ProjectDbEntity {
         }
         return new Project(dbEntity.id, dbEntity.publicId,
                 dbEntity.name,
-                dbEntity.githubName,
+                dbEntity.cloneUrl,
+                dbEntity.sourceProvider,
                 dbEntity.totalRuns,
                 dbEntity.nextBuildNumber,
                 dbEntity.mostRecentBuild,

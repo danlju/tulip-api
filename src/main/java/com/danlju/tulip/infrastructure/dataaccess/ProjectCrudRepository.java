@@ -11,7 +11,6 @@ import java.util.UUID;
 
 public interface ProjectCrudRepository extends CrudRepository<ProjectDbEntity, Integer> {
     ProjectDbEntity findByPublicId(UUID publicId);
-    ProjectDbEntity getByGithubName(String githubName);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM ProjectDbEntity p WHERE p.publicId = :publicId")
     ProjectDbEntity findByPublicIdForUpdate(@Param("publicId") UUID publicId);

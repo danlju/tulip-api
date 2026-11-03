@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f6f7f4">
+    <title th:text="${title}">Tulip</title>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2.1.1/css/pico.min.css">
+    <link rel="stylesheet" th:href="@{/css/tulip.css}">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js"
+            integrity="sha384-2OatzQy1H+Zd/IIrjr1TcuDGqLXeHhbooAyJY1KdQMKnr4LZ22k31GBLdYKHmVjg"
+            crossorigin="anonymous" defer></script>
+</head>
+<body>
+<header th:fragment="navigation(activePage)" class="site-header">
+    <nav class="site-nav" aria-label="Main navigation">
+        <a class="brand" th:href="@{/projects}" aria-label="Tulip home">
+            <span class="brand-mark" aria-hidden="true">t</span>
+            <span>tulip<span class="brand-dot">.</span></span>
+        </a>
+        <div class="nav-links">
+            <a th:href="@{/projects}" th:classappend="${activePage == 'projects' ? 'is-active' : ''}">Projects</a>
+            <span class="nav-status"><span></span> API connected</span>
+        </div>
+    </nav>
+</header>
+<footer th:fragment="footer" class="site-footer">
+    <span>Built to keep the work moving.</span>
+    <span class="footer-wordmark">TULIP / BUILD SYSTEM</span>
+</footer>
+</body>
+</html>

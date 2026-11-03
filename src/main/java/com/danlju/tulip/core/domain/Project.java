@@ -9,6 +9,7 @@ public class Project {
     private UUID publicId;
     private String name;
     private String cloneUrl;
+    private SourceProvider sourceProvider;
     private Integer totalRuns;
     private Integer nextBuildNumber;
     private Instant mostRecentBuild;
@@ -17,10 +18,15 @@ public class Project {
     private String configPath; // TODO: maybe move to separate config object
 
     public Project(Integer id, UUID publicId, String name, String cloneUrl, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+        this(id, publicId, name, cloneUrl, SourceProvider.GENERIC, totalRuns, nextBuildNumber, mostRecentBuild, mostRecentBuildStatus, lastSyncedAt);
+    }
+
+    public Project(Integer id, UUID publicId, String name, String cloneUrl, SourceProvider sourceProvider, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.id = id;
         this.publicId = publicId;
         this.name = name;
         this.cloneUrl = cloneUrl;
+        this.sourceProvider = sourceProvider == null ? SourceProvider.GENERIC : sourceProvider;
         this.totalRuns = totalRuns;
         this.nextBuildNumber = nextBuildNumber;
         this.mostRecentBuild = mostRecentBuild;
@@ -29,9 +35,14 @@ public class Project {
     }
 
     public Project(UUID publicId, String name, String cloneUrl, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
+        this(publicId, name, cloneUrl, SourceProvider.GENERIC, totalRuns, nextBuildNumber, mostRecentBuild, mostRecentBuildStatus, lastSyncedAt);
+    }
+
+    public Project(UUID publicId, String name, String cloneUrl, SourceProvider sourceProvider, Integer totalRuns, Integer nextBuildNumber, Instant mostRecentBuild, String mostRecentBuildStatus, Instant lastSyncedAt) {
         this.publicId = publicId;
         this.name = name;
         this.cloneUrl = cloneUrl;
+        this.sourceProvider = sourceProvider == null ? SourceProvider.GENERIC : sourceProvider;
         this.totalRuns = totalRuns;
         this.nextBuildNumber = nextBuildNumber;
         this.mostRecentBuild = mostRecentBuild;
@@ -69,6 +80,14 @@ public class Project {
 
     public void setCloneUrl(String cloneUrl) {
         this.cloneUrl = cloneUrl;
+    }
+
+    public SourceProvider getSourceProvider() {
+        return sourceProvider == null ? SourceProvider.GENERIC : sourceProvider;
+    }
+
+    public void setSourceProvider(SourceProvider sourceProvider) {
+        this.sourceProvider = sourceProvider == null ? SourceProvider.GENERIC : sourceProvider;
     }
 
     public Integer getTotalRuns() {

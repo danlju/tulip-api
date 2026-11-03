@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/shell :: head(${title + ' · Tulip'})}"></head>
+<body>
+<div th:replace="~{fragments/shell :: navigation('')}"></div>
+<main class="page-shell error-page">
+    <p class="eyebrow">SOMETHING WENT WRONG</p>
+    <h1 th:text="${title}">Tulip API unavailable</h1>
+    <p class="lede" th:text="${message}">Check the API connection.</p>
+    <a class="button-link" th:href="@{/projects}">Back to projects <span aria-hidden="true">→</span></a>
+</main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
+</body>
+</html>

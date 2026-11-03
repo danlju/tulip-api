@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/shell :: head(${project.name + ' · Tulip'})}"></head>
+<body>
+<div th:replace="~{fragments/shell :: navigation(${activePage})}"></div>
+<main class="page-shell">
+    <div th:if="${notice}" class="notice" role="status" th:text="${notice}">Build requested.</div>
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <a th:href="@{/projects}">Projects</a><span aria-hidden="true">/</span><span th:text="${project.name}">Project</span>
+    </nav>
+
+    <section class="page-heading project-heading">
+        <div>
+            <p class="eyebrow">PROJECT / BUILD HISTORY</p>
+            <h1 th:text="${project.name}">Tulip project</h1>
+            <p class="lede repo-url" th:text="${project.cloneUrl}">https://github.com/example/repo</p>
+        </div>
+        <a class="button-link button-link-quiet" href="#run-build">Run a build <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="section-block build-section" aria-labelledby="history-heading">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">ACTIVITY</p>
+                <h2 id="history-heading">Build history</h2>
+                <p>Refreshes automatically while you watch.</p>
+            </div>
+            <span class="live-indicator"><span></span> LIVE</span>
+        </div>
+        <div id="build-list" class="build-list" th:attr="hx-get=@{/projects/{id}/builds(id=${project.id})}"
+             hx-trigger="load, every 15s" hx-swap="outerHTML">
+            <div class="loading-state"><span class="loader"></span> Loading build history…</div>
+        </div>
+    </section>
+
+    <section id="run-build" class="run-panel">
+        <div>
+            <p class="eyebrow">MANUAL RUN</p>
+            <h2>Start a build</h2>
+            <p>Choose a branch, or pin the build to a commit SHA.</p>
+        </div>
+        <form class="run-form" method="post" th:action="@{/projects/{id}/builds(id=${project.id})}">
+            <label for="branch">Branch</label>
+            <input id="branch" name="branch" value="main" placeholder="main" required>
+            <label for="commit-sha">Commit SHA <span class="optional">optional</span></label>
+            <input id="commit-sha" name="commitSha" placeholder="Latest branch commit if blank">
+            <button type="submit">Queue build <span aria-hidden="true">→</span></button>
+        </form>
+    </section>
+</main>
+<footer th:replace="~{fragments/shell :: footer}"></footer>
+</body>
+</html>

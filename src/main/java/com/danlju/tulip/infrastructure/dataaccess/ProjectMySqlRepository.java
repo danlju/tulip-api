@@ -26,24 +26,11 @@ public class ProjectMySqlRepository implements ProjectRepository {
     }
 
     @Override
-    public Project findByGithubName(String githubName) {
-        return ProjectDbEntity.toProject(
-                projectCrudRepository.getByGithubName(githubName)
-        );
-    }
-
-    @Override
     public Project save(Project project) {
         return ProjectDbEntity.toProject(
                 projectCrudRepository.save(
                         ProjectDbEntity.fromProject(project)
                 )
-        );
-    }
-
-    public Project findByCategory(UUID publicId) {
-        return ProjectDbEntity.toProject(
-                projectCrudRepository.findByPublicId(publicId)
         );
     }
 

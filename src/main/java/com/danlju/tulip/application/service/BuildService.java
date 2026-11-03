@@ -126,7 +126,7 @@ public class BuildService implements BuildUseCases {
                     Integer.toString(savedBuild.getId()),
                     project.getId().toString(), // TODO
                     project.getCloneUrl(),
-                    "GENERIC", // TODO: ?
+                    project.getSourceProvider().name(),
                     build.getBranch(),
                     build.getCommitSha(),
                     build.getCommitMessage(),

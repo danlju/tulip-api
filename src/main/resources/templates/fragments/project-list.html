@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="project-list" id="project-list">
+    <div th:if="${#lists.isEmpty(projects)}" class="empty-state">
+        <span class="empty-mark">＋</span>
+        <h3>Nothing building yet</h3>
+        <p>Connect a Git repository to run your first build.</p>
+    </div>
+    <div th:unless="${#lists.isEmpty(projects)}" class="project-grid">
+        <a class="project-card" th:each="project : ${projects}"
+           th:href="@{/projects/{id}(id=${project.id})}">
+            <div class="project-card-top">
+                <span class="project-icon" aria-hidden="true">🌷</span>
+                <span class="arrow-link" aria-hidden="true">↗</span>
+            </div>
+            <h3 th:text="${project.name}">Tulip project</h3>
+            <p class="repo-url" th:text="${project.cloneUrl}">https://github.com/example/repo</p>
+            <div class="project-card-footer">
+                <span class="subtle-label">Open build history</span>
+                <span class="project-id" th:text="${#strings.abbreviate(project.id, 12)}">project id</span>
+            </div>
+        </a>
+    </div>
+</div>
+</body>
+</html>

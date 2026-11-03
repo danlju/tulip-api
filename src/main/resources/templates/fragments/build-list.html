@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="build-list" id="build-list" class="build-list"
+     th:attr="hx-get=@{/projects/{id}/builds(id=${projectId})}"
+     hx-trigger="load, every 15s" hx-swap="outerHTML">
+    <div th:if="${apiError}" class="inline-error" role="status">
+        Build history could not be refreshed. Retrying automatically…
+    </div>
+    <div th:if="${!apiError and #lists.isEmpty(builds)}" class="empty-state">
+        <span class="empty-mark">↗</span>
+        <h3>No builds yet</h3>
+        <p>Start a build to see its progress and history here.</p>
+    </div>
+    <div th:if="${!apiError and !#lists.isEmpty(builds)}" class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th scope="col">Run</th>
+                <th scope="col">Status</th>
+                <th scope="col">Branch</th>
+                <th scope="col">Commit</th>
+                <th scope="col">Duration</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="build : ${builds}">
+                <td class="run-number" th:text="${'#' + build.runNumber}">#1</td>
+                <td><span class="status-pill" th:classappend="${'status-' + #strings.toLowerCase(build.status)}"
+                          th:text="${build.status}">COMPLETED</span></td>
+                <td th:text="${build.branch != null and !build.branch.isBlank() ? build.branch : '—'}">main</td>
+                <td><code th:text="${build.commit != null and !build.commit.isBlank() ? #strings.abbreviate(build.commit, 12) : '—'}">a1b2c3d4</code></td>
+                <td th:text="${build.duration != null ? build.duration : '—'}">12s</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

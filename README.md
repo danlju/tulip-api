@@ -60,7 +60,8 @@ tulip-api
 
 #### 🔹 tulip-ui
 
-* React application
+* Thymeleaf-rendered pages in the Spring Boot API
+* HTMX for build-history refreshes; Pico CSS and custom CSS for styling
 * Displays projects and builds
 * Shows build status and history
 
@@ -110,10 +111,14 @@ Instructions will be added as the project stabilizes. For now, you can start a d
 cd dev && docker-compose up -d
 ```
 
+Start the API with `./mvnw spring-boot:run`, then open <http://localhost:8080> for the server-rendered UI. The UI uses Thymeleaf templates, HTMX for build-history refreshes, and Pico CSS with local custom styles. It runs in the same Spring Boot application as the JSON API; no Node.js or npm setup is needed.
+
 
 ---
 
 ## 🤝 Notes
+
+The worker reports build status to the API's internal endpoint using the `X-Tulip-Worker-Token` header. Set `TULIP_WORKER_TOKEN` to the same non-empty secret for both the API and worker. The API rejects internal status updates if the token is missing or does not match.
 
 This project is primarily a learning and exploration effort focused on:
 
