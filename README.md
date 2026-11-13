@@ -125,3 +125,7 @@ This project is primarily a learning and exploration effort focused on:
 * CI/CD system design
 * distributed systems
 * clean architecture practices
+
+Build dispatch now uses a transactional outbox and workers claim expiring,
+attempt-scoped execution leases. See [build recovery](docs/build-recovery.md)
+for upgrade details, regression tests, and process restart checks.

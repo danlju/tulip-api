@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "builds")
+@Table(name = "builds", uniqueConstraints = @UniqueConstraint(name = "uq_build_project_number", columnNames = {"project_id", "number"}))
 public class BuildDbEntity {
 
     @Id
@@ -16,7 +16,6 @@ public class BuildDbEntity {
     private Integer id;
     @Column(unique = true)
     private UUID publicId;
-    @Column(unique = true)
     private Integer number;
     @ManyToOne(fetch = FetchType.LAZY, optional = false) // TODO: lazy
     @JoinColumn(name = "project_id", nullable = false)

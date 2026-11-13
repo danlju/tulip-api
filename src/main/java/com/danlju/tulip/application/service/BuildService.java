@@ -17,10 +17,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.services.sqs.SqsClient;
-import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
 import java.util.*;
 
@@ -36,10 +33,8 @@ public class BuildService implements BuildUseCases {
     private BuildRepository buildRepository;
 
     @Autowired
-    private SqsClient sqsClient;
+    private com.danlju.tulip.infrastructure.dataaccess.OutboxRepository outboxRepository;
 
-    @Value("${sqs.queue-url}")
-    private String sqsQueueUrl;
 
     public BuildService(ProjectRepository projectRepository, BuildRepository buildRepository) {
         this.projectRepository = projectRepository;
@@ -140,10 +135,7 @@ public class BuildService implements BuildUseCases {
         }
 
         logger.info("Payload: {}", payload);
-        sqsClient.sendMessage(SendMessageRequest.builder()
-                .queueUrl(sqsQueueUrl)
-                .messageBody(payload)
-                .build());
+        outboxRepository.save(new com.danlju.tulip.infrastructure.dataaccess.entity.OutboxMessage(payload));
 
         return new RequestBuildResult(build.getPublicId());
     }
